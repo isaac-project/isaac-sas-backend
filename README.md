@@ -8,6 +8,7 @@ Read more in [this blog post](https://medium.com/@amirziai/a-flask-api-for-servi
 - Flask
 - pandas
 - numpy
+- dkpro-cassis
 
 ```
 pip install -r requirements.txt
