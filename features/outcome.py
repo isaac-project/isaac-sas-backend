@@ -1,4 +1,4 @@
-from extractor import FeatureExtractor
+from features.extractor import FeatureExtractor
 from cassis import Cas
 
 class Outcome(FeatureExtractor):
@@ -6,5 +6,5 @@ class Outcome(FeatureExtractor):
 
     def extract(self, cas: Cas):
         studentView = cas.get_view(self.STUDENT_ANSWER_VIEW)
-        answer = next(studentView.select(ANSWER_TYPE))
+        answer = next(studentView.select(self.ANSWER_TYPE))
         return int(answer.contentScore)
