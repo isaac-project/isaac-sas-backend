@@ -11,8 +11,10 @@ from sklearn.externals import joblib
 app = Flask(__name__)
 
 # inputs
-training_data = 'data/titanic.csv'
-include = ['Age', 'Sex', 'Embarked', 'Survived']
+training_data = 'data/gold-standard-features.tsv'
+include = ["KeywordOverlap", "TargetTokenOverlap","StudentTokenOverlap","TargetChunkOverlap",
+        "StudentChunkOverlap","TargetTripleOverlap","StudentTripleOverlap","LC_TokenMatch",
+        "LemmaMatch","SynonymMatch","Variety","BinaryDiagnosis"]
 dependent_variable = include[-1]
 
 model_directory = 'model'
@@ -54,7 +56,7 @@ def train():
     # can do the training separately and just update the pickles
     from sklearn.ensemble import RandomForestClassifier as rf
 
-    df = pd.read_csv(training_data)
+    df = pd.read_table(training_data)
     df_ = df[include]
 
     categoricals = []  # going to one-hot encode categorical variables
