@@ -1,6 +1,7 @@
 from abc import ABC,abstractmethod
 from cassis import Cas
 from enum import Enum, auto
+from cassis.typesystem import Type
 
 class AlignmentLabel(Enum):
     LC_TOKEN = auto()
@@ -24,14 +25,17 @@ class FeatureExtractor(ABC):
     
     @abstractmethod
     def extract(self, cas: Cas) -> float:
-        pass
+        return 0.0
     
-    def getPercOfMappingType(self, cas: Cas, alignment: AlignmentLabel) -> float:
+    def get_mappable_ann(self, cas: Cas, t: Type):
+        return next(cas.select_covered(self.MAPPABLE_TYPE, t))
+    
+    def get_perc_of_mapping_type(self, cas: Cas, alignment: AlignmentLabel) -> float:
         overallMatchesCount = 0
         itemsOfGivenTypeCount = 0
         for t in cas.select(self.TOKEN_TYPE):
 
-            item = next(cas.select_covered(self.MAPPABLE_TYPE, t));
+            item = self.get_mappable_ann(cas, t)
 
             # check for matches/alignment
             if item.match is not None and item.match.target is not None:
@@ -71,12 +75,13 @@ class KeywordOverlap(FeatureExtractor):
     
     def extract(self, cas:Cas)->float:
         targetView = cas.get_view(self.TARGET_ANSWER_VIEW)
-        cas.select
+        
         matchedKeywords = 0
         allKeywords = 0
         for k in targetView.select(self.KEYWORD_TYPE):
             allKeywords += 1
-            mappable = next(targetView.select_covered(self.MAPPABLE_TYPE, k))
+            mappable = self.get_mappable_ann(targetView, k)
+            
             if mappable.match:
                 matchedKeywords += 1
         
@@ -84,9 +89,11 @@ class KeywordOverlap(FeatureExtractor):
             return 0.0
         else:
             return matchedKeywords / allKeywords
-    
-class LC_TokenMatch(FeatureExtractor):
-    
+
+class PercentOfMappingType(FeatureExtractor):
+    def __init__(self, alignment: AlignmentLabel):
+        self.alignment = alignment
+        
     def extract(self, cas:Cas)->float:
         studentView = cas.get_view(self.STUDENT_ANSWER_VIEW)
-        return self.getPercOfMappingType(studentView, AlignmentLabel.LC_TOKEN)
+        return self.get_perc_of_mapping_type(studentView, self.alignment)

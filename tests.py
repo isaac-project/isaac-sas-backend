@@ -1,6 +1,7 @@
 import unittest
 from cassis import *
-from features.extractor import Outcome, KeywordOverlap, LC_TokenMatch
+from features.extractor import Outcome, KeywordOverlap, PercentOfMappingType,\
+    AlignmentLabel
 
 class ReadCASTestCase(unittest.TestCase):
     def test_load_typesystem(self):
@@ -64,8 +65,8 @@ class ReadCASTestCase(unittest.TestCase):
         with open(file_to_read, 'rb') as f:
             cas = load_cas_from_xmi(f, typesystem=final_ts)
         
-        lc = LC_TokenMatch().extract(cas)
+        lc = PercentOfMappingType(AlignmentLabel.LC_TOKEN).extract(cas)
         self.assertTrue(lc > 0.0);
-                
+        
 if __name__ == '__main__':
     unittest.main()
