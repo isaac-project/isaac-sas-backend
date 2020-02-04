@@ -29,12 +29,12 @@ class FeatureExtractor(ABC):
         return 0.0
     
     def get_mappable_ann(self, cas: Cas, t: Type):
-        return next(cas.select_covered(self.MAPPABLE_TYPE, t))
+        return next(cas.select_covered(FeatureExtractor.MAPPABLE_TYPE, t))
     
     def get_perc_of_mapping_type(self, cas: Cas, alignment: AlignmentLabel) -> float:
         overallMatchesCount = 0
         itemsOfGivenTypeCount = 0
-        for t in cas.select(self.TOKEN_TYPE):
+        for t in cas.select(FeatureExtractor.TOKEN_TYPE):
 
             item = self.get_mappable_ann(cas, t)
 
@@ -55,20 +55,20 @@ class Outcome(FeatureExtractor):
     LABEL2INT = {"correct" : 1, "incorrect" : 0, "true" : 1, "false" : 0}
     
     def extract(self, cas: Cas) -> float:
-        studentView = cas.get_view(self.STUDENT_ANSWER_VIEW)
-        answer = next(studentView.select(self.ANSWER_TYPE))
+        studentView = cas.get_view(FeatureExtractor.STUDENT_ANSWER_VIEW)
+        answer = next(studentView.select(FeatureExtractor.ANSWER_TYPE))
         score = answer.contentScore
         
-        if score in self.LABEL2INT:
-            return self.LABEL2INT[score]
+        if score in Outcome.LABEL2INT:
+            return Outcome.LABEL2INT[score]
         else:
             return int(answer.contentScore)
 
 class Diagnosis(FeatureExtractor):
     
     def extract(self, cas:Cas)->float:
-        studentView = cas.get_view(self.STUDENT_ANSWER_VIEW)
-        answer = next(studentView.select(self.ANSWER_TYPE))
+        studentView = cas.get_view(FeatureExtractor.STUDENT_ANSWER_VIEW)
+        answer = next(studentView.select(FeatureExtractor.ANSWER_TYPE))
         return int(answer.contentDiagnosis)
 
 class PercentOfMappingType(FeatureExtractor):
@@ -76,7 +76,7 @@ class PercentOfMappingType(FeatureExtractor):
         self.alignment = alignment
         
     def extract(self, cas:Cas)->float:
-        studentView = cas.get_view(self.STUDENT_ANSWER_VIEW)
+        studentView = cas.get_view(FeatureExtractor.STUDENT_ANSWER_VIEW)
         return self.get_perc_of_mapping_type(studentView, self.alignment)
     
 class MatchedAnnotation(FeatureExtractor):
@@ -128,10 +128,10 @@ class TripleOverlap(FeatureExtractor):
     
     def extract(self, cas:Cas)->float:
         view = cas.get_view(self.view_name)
-        dep_matches = len(list(view.select(self.DEP_MAPPING_TYPE)))
+        dep_matches = len(list(view.select(TripleOverlap.DEP_MAPPING_TYPE)))
         dep_rels = 0
         
-        for d in view.select(self.DEPENDENCY_TYPE):
+        for d in view.select(FeatureExtractor.DEPENDENCY_TYPE):
             if d.DependencyType in self.english_arg_rels:
                 dep_rels += 1
         
@@ -143,7 +143,7 @@ class TripleOverlap(FeatureExtractor):
 class Variety(FeatureExtractor):
     
     def extract(self, cas:Cas)->float:
-        studentView = cas.get_view(self.STUDENT_ANSWER_VIEW)
+        studentView = cas.get_view(FeatureExtractor.STUDENT_ANSWER_VIEW)
         
         variety = 0.0
         for al in AlignmentLabel:

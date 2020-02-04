@@ -95,7 +95,6 @@ class ReadCASTestCase(unittest.TestCase):
             cas = load_cas_from_xmi(f, typesystem=final_ts)
         
         variety = Variety().extract(cas)
-        print(variety)
         self.assertTrue(variety > 0.0);
         
 if __name__ == '__main__':
