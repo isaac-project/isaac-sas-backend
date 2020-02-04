@@ -4,9 +4,12 @@ from features.extractor import Outcome, PercentOfMappingType,\
     AlignmentLabel, MatchedAnnotation, FeatureExtractor, TripleOverlap, Variety
 
 class ReadCASTestCase(unittest.TestCase):
+    TYPE_SYSTEM_PATH = "features/isaac-type-system.xml"
+    EXAMPLE_XMI_PATH = "1ET5_7_0.xmi"
+    
     def test_load_typesystem(self):
         dkpro_ts = load_dkpro_core_typesystem()
-        isaac_ts_file = "features/isaac-type-system.xml"
+        isaac_ts_file = ReadCASTestCase.TYPE_SYSTEM_PATH
         with open(isaac_ts_file, 'rb') as f:
             typesystem = load_typesystem(f)
 
@@ -16,24 +19,24 @@ class ReadCASTestCase(unittest.TestCase):
 
     def test_read_cas(self):
         dkpro_ts = load_dkpro_core_typesystem()
-        isaac_ts_file = "features/isaac-type-system.xml"
+        isaac_ts_file = ReadCASTestCase.TYPE_SYSTEM_PATH
         with open(isaac_ts_file, 'rb') as f:
             isaac_ts = load_typesystem(f)
 
         final_ts = merge_typesystems(dkpro_ts,isaac_ts)
-        file_to_read = "data/xmi/1ET5_7_0.xmi"
+        file_to_read = ReadCASTestCase.EXAMPLE_XMI_PATH
         with open(file_to_read, 'rb') as f:
             cas = load_cas_from_xmi(f, typesystem=final_ts)
         self.assertIsInstance(cas, Cas)
         
     def test_extract_outcome(self):
         dkpro_ts = load_dkpro_core_typesystem()
-        isaac_ts_file = "features/isaac-type-system.xml"
+        isaac_ts_file = ReadCASTestCase.TYPE_SYSTEM_PATH
         with open(isaac_ts_file, 'rb') as f:
             isaac_ts = load_typesystem(f)
 
         final_ts = merge_typesystems(dkpro_ts,isaac_ts)
-        file_to_read = "data/xmi/1ET5_7_0.xmi"
+        file_to_read = ReadCASTestCase.EXAMPLE_XMI_PATH
         with open(file_to_read, 'rb') as f:
             cas = load_cas_from_xmi(f, typesystem=final_ts)
         
@@ -42,12 +45,12 @@ class ReadCASTestCase(unittest.TestCase):
         
     def test_extract_kw_overlap(self):
         dkpro_ts = load_dkpro_core_typesystem()
-        isaac_ts_file = "features/isaac-type-system.xml"
+        isaac_ts_file = ReadCASTestCase.TYPE_SYSTEM_PATH
         with open(isaac_ts_file, 'rb') as f:
             isaac_ts = load_typesystem(f)
 
         final_ts = merge_typesystems(dkpro_ts,isaac_ts)
-        file_to_read = "data/xmi/1ET5_7_0.xmi"
+        file_to_read = ReadCASTestCase.EXAMPLE_XMI_PATH
         with open(file_to_read, 'rb') as f:
             cas = load_cas_from_xmi(f, typesystem=final_ts)
         
@@ -57,12 +60,12 @@ class ReadCASTestCase(unittest.TestCase):
     
     def test_extract_lc_token_overlap(self):
         dkpro_ts = load_dkpro_core_typesystem()
-        isaac_ts_file = "features/isaac-type-system.xml"
+        isaac_ts_file = ReadCASTestCase.TYPE_SYSTEM_PATH
         with open(isaac_ts_file, 'rb') as f:
             isaac_ts = load_typesystem(f)
 
         final_ts = merge_typesystems(dkpro_ts,isaac_ts)
-        file_to_read = "data/xmi/1ET5_7_0.xmi"
+        file_to_read = ReadCASTestCase.EXAMPLE_XMI_PATH
         with open(file_to_read, 'rb') as f:
             cas = load_cas_from_xmi(f, typesystem=final_ts)
         
@@ -71,12 +74,12 @@ class ReadCASTestCase(unittest.TestCase):
     
     def test_extract_student_dep_overlap(self):
         dkpro_ts = load_dkpro_core_typesystem()
-        isaac_ts_file = "features/isaac-type-system.xml"
+        isaac_ts_file = ReadCASTestCase.TYPE_SYSTEM_PATH
         with open(isaac_ts_file, 'rb') as f:
             isaac_ts = load_typesystem(f)
 
         final_ts = merge_typesystems(dkpro_ts,isaac_ts)
-        file_to_read = "data/xmi/1ET5_7_0.xmi"
+        file_to_read = ReadCASTestCase.EXAMPLE_XMI_PATH
         with open(file_to_read, 'rb') as f:
             cas = load_cas_from_xmi(f, typesystem=final_ts)
         
@@ -85,12 +88,12 @@ class ReadCASTestCase(unittest.TestCase):
     
     def test_extract_variety(self):
         dkpro_ts = load_dkpro_core_typesystem()
-        isaac_ts_file = "features/isaac-type-system.xml"
+        isaac_ts_file = ReadCASTestCase.TYPE_SYSTEM_PATH
         with open(isaac_ts_file, 'rb') as f:
             isaac_ts = load_typesystem(f)
 
         final_ts = merge_typesystems(dkpro_ts,isaac_ts)
-        file_to_read = "data/xmi/1ET5_7_0.xmi"
+        file_to_read = ReadCASTestCase.EXAMPLE_XMI_PATH
         with open(file_to_read, 'rb') as f:
             cas = load_cas_from_xmi(f, typesystem=final_ts)
         
