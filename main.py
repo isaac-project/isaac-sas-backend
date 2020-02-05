@@ -8,6 +8,9 @@ from flask import Flask, request, jsonify
 import pandas as pd
 from sklearn.externals import joblib
 
+from features import uima
+from features.extractor import FeatureExtraction
+
 app = Flask(__name__)
 
 # inputs
@@ -20,6 +23,12 @@ dependent_variable = include[-1]
 model_directory = 'model'
 model_file_name = '%s/model.pkl' % model_directory
 model_columns_file_name = '%s/model_columns.pkl' % model_directory
+
+# UIMA / features stuff
+# type system
+isaac_ts = uima.load_isaac_ts() 
+# feature extraction
+extraction = FeatureExtraction()
 
 # These will be populated at training time
 model_columns = None
