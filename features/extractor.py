@@ -2,6 +2,8 @@ from abc import ABC,abstractmethod
 from cassis import Cas
 from enum import Enum, auto
 from cassis.typesystem import Type
+from typing import List,Tuple
+from features import uima
 
 class AlignmentLabel(Enum):
     LC_TOKEN = auto()
@@ -23,11 +25,12 @@ class FeatureExtractor(ABC):
     TOKEN_TYPE = "de.tudarmstadt.ukp.dkpro.core.api.segmentation.type.Token"
     KEYWORD_TYPE = "de.sfs.isaac.server.nlp.types.Keyword"
     DEPENDENCY_TYPE = "de.tudarmstadt.ukp.dkpro.core.api.syntax.type.dependency.Dependency"
+    CHUNK_TYPE = "de.tudarmstadt.ukp.dkpro.core.api.syntax.type.chunk.Chunk"
     
     @abstractmethod
-    def extract(self, cas: Cas) -> float:
-        return 0.0
-    
+    def extract(self, cas: Cas) -> (str,float):
+        return ("", 0.0)
+        
     def get_mappable_ann(self, cas: Cas, t: Type):
         return next(cas.select_covered(FeatureExtractor.MAPPABLE_TYPE, t))
     
@@ -54,37 +57,37 @@ class FeatureExtractor(ABC):
 class Outcome(FeatureExtractor):
     LABEL2INT = {"correct" : 1, "incorrect" : 0, "true" : 1, "false" : 0}
     
-    def extract(self, cas: Cas) -> float:
+    def extract(self, cas: Cas) -> (str,float):
         studentView = cas.get_view(FeatureExtractor.STUDENT_ANSWER_VIEW)
         answer = next(studentView.select(FeatureExtractor.ANSWER_TYPE))
         score = answer.contentScore
         
         if score in Outcome.LABEL2INT:
-            return Outcome.LABEL2INT[score]
+            return ("Outcome", Outcome.LABEL2INT[score])
         else:
-            return int(answer.contentScore)
+            return ("Outcome", int(answer.contentScore))
 
 class Diagnosis(FeatureExtractor):
     
-    def extract(self, cas:Cas)->float:
+    def extract(self, cas:Cas)->(str,float):
         studentView = cas.get_view(FeatureExtractor.STUDENT_ANSWER_VIEW)
         answer = next(studentView.select(FeatureExtractor.ANSWER_TYPE))
-        return int(answer.contentDiagnosis)
+        return ("Diagnosis", int(answer.contentDiagnosis))
 
 class PercentOfMappingType(FeatureExtractor):
     def __init__(self, alignment: AlignmentLabel):
         self.alignment = alignment
         
-    def extract(self, cas:Cas)->float:
+    def extract(self, cas:Cas)->(str,float):
         studentView = cas.get_view(FeatureExtractor.STUDENT_ANSWER_VIEW)
-        return self.get_perc_of_mapping_type(studentView, self.alignment)
+        return (self.alignment.name + "-Match", self.get_perc_of_mapping_type(studentView, self.alignment))
     
 class MatchedAnnotation(FeatureExtractor):
     def __init__(self, view_name: str, ann_type: str):
         self.view_name = view_name
         self.ann_type = ann_type
     
-    def extract(self, cas:Cas)->float:
+    def extract(self, cas:Cas)->(str,float):
         view = cas.get_view(self.view_name)
         matched_ann = 0
         all_ann = 0
@@ -95,10 +98,13 @@ class MatchedAnnotation(FeatureExtractor):
             if mappable.match:
                 matched_ann += 1
     
+        ret = -1.0
         if not all_ann:
-            return 0.0
+            ret = 0.0
         else:
-            return matched_ann / all_ann
+            ret = matched_ann / all_ann
+        
+        return (self.view_name + "-" + uima.simple_type_name(self.ann_type) + "-Overlap", ret)
 
 class TripleOverlap(FeatureExtractor):
     DEP_MAPPING_TYPE = "de.sfs.isaac.server.nlp.types.DepMapping"
@@ -126,7 +132,7 @@ class TripleOverlap(FeatureExtractor):
             "acomp",
             "agent"])
     
-    def extract(self, cas:Cas)->float:
+    def extract(self, cas:Cas)->(str,float):
         view = cas.get_view(self.view_name)
         dep_matches = len(list(view.select(TripleOverlap.DEP_MAPPING_TYPE)))
         dep_rels = 0
@@ -135,18 +141,45 @@ class TripleOverlap(FeatureExtractor):
             if d.DependencyType in self.english_arg_rels:
                 dep_rels += 1
         
+        ret = -1.0
         if not dep_rels:
-            return 0.0
+            ret = 0.0
         else:
-            return dep_matches / dep_rels
-
+            ret = dep_matches / dep_rels
+        
+        return (self.view_name + "-Triple-Overlap", ret)
+    
 class Variety(FeatureExtractor):
     
-    def extract(self, cas:Cas)->float:
+    def extract(self, cas:Cas)->(str,float):
         studentView = cas.get_view(FeatureExtractor.STUDENT_ANSWER_VIEW)
         
         variety = 0.0
         for al in AlignmentLabel:
             variety += self.get_perc_of_mapping_type(studentView, al)
         
-        return variety;
+        return ("Variety", variety);
+
+class FeatureExtraction():
+    
+    def __init__(self, extractors: List[FeatureExtractor] = None):
+        if extractors:
+            self.extractors = extractors
+        else:
+            self.extractors = [
+                MatchedAnnotation(FeatureExtractor.TARGET_ANSWER_VIEW, FeatureExtractor.KEYWORD_TYPE),
+                MatchedAnnotation(FeatureExtractor.TARGET_ANSWER_VIEW, FeatureExtractor.TOKEN_TYPE),
+                MatchedAnnotation(FeatureExtractor.STUDENT_ANSWER_VIEW, FeatureExtractor.TOKEN_TYPE),
+                MatchedAnnotation(FeatureExtractor.TARGET_ANSWER_VIEW, FeatureExtractor.CHUNK_TYPE),
+                MatchedAnnotation(FeatureExtractor.STUDENT_ANSWER_VIEW, FeatureExtractor.CHUNK_TYPE),
+                TripleOverlap(FeatureExtractor.TARGET_ANSWER_VIEW),
+                TripleOverlap(FeatureExtractor.STUDENT_ANSWER_VIEW),
+                PercentOfMappingType(AlignmentLabel.LC_TOKEN),
+                PercentOfMappingType(AlignmentLabel.LEMMA),
+                PercentOfMappingType(AlignmentLabel.SYNONYM),
+                Variety(),
+                Outcome()
+            ]
+    
+    def run(self, cas: Cas) -> List[Tuple]:
+        return [x.extract(cas) for x in self.extractors]
