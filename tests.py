@@ -5,7 +5,7 @@ from features.extractor import Outcome, PercentOfMappingType,\
 
 class ReadCASTestCase(unittest.TestCase):
     TYPE_SYSTEM_PATH = "features/isaac-type-system.xml"
-    EXAMPLE_XMI_PATH = "1ET5_7_0.xmi"
+    EXAMPLE_XMI_PATH = "testdata/xmi/1ET5_7_0.xmi"
     
     def test_load_typesystem(self):
         dkpro_ts = load_dkpro_core_typesystem()
