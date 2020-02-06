@@ -3,6 +3,7 @@ import unittest
 from features.extractor import FeatureExtraction
 from features import uima
 from cassis.xmi import load_cas_from_xmi
+from collections import OrderedDict
 
 class ReadCASTestCase(unittest.TestCase):
     EXAMPLE_XMI_PATH = "testdata/xmi/1ET5_7_0.xmi"
@@ -16,7 +17,7 @@ class ReadCASTestCase(unittest.TestCase):
         extraction = FeatureExtraction()
         feats = extraction.run(cas)
         
-        self.assertIsInstance(feats, list)
+        self.assertIsInstance(feats, OrderedDict)
         self.assertEqual(len(extraction.extractors),
                          len(feats))
         

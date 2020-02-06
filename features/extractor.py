@@ -2,8 +2,9 @@ from abc import ABC,abstractmethod
 from cassis import Cas
 from enum import Enum, auto
 from cassis.typesystem import Type
-from typing import List,Tuple
+from typing import List
 from features import uima
+from collections import OrderedDict
 
 class AlignmentLabel(Enum):
     LC_TOKEN = auto()
@@ -181,5 +182,5 @@ class FeatureExtraction():
                 Outcome()
             ]
     
-    def run(self, cas: Cas) -> List[Tuple]:
-        return [x.extract(cas) for x in self.extractors]
+    def run(self, cas: Cas) -> OrderedDict:
+        return OrderedDict([x.extract(cas) for x in self.extractors])

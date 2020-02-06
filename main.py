@@ -11,7 +11,8 @@ from sklearn.externals import joblib
 from features import uima
 from features.extractor import FeatureExtraction
 from cassis.xmi import load_cas_from_xmi
-from _io import BytesIO
+from io import BytesIO
+from collections import OrderedDict
 
 app = Flask(__name__)
 
@@ -38,6 +39,11 @@ extraction = FeatureExtraction()
 model_columns = None
 clf = None
 
+def listify_values(data: dict) -> OrderedDict:
+    ret = OrderedDict()
+    for key,val in data.items():
+        ret[key] = [val]
+    return ret
 
 @app.route('/predict', methods=['POST'])
 def predict():
@@ -53,8 +59,8 @@ def predict():
                 # run feature extraction
                 cas = load_cas_from_xmi(BytesIO(request.data), typesystem=isaac_ts)
                 feats = extraction.run(cas)
-                data = pd.DataFrame.from_items(
-                    [(f[0],[f[1]]) for f in feats])
+                data = pd.DataFrame.from_dict(
+                    listify_values(feats))
             
             query = pd.get_dummies(data)
 
