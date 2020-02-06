@@ -10,14 +10,18 @@ from sklearn.externals import joblib
 
 from features import uima
 from features.extractor import FeatureExtraction
+from cassis.xmi import load_cas_from_xmi
+from _io import BytesIO
 
 app = Flask(__name__)
 
 # inputs
 training_data = 'data/gold-standard-features.tsv'
-include = ["KeywordOverlap", "TargetTokenOverlap","StudentTokenOverlap","TargetChunkOverlap",
-        "StudentChunkOverlap","TargetTripleOverlap","StudentTripleOverlap","LC_TokenMatch",
-        "LemmaMatch","SynonymMatch","Variety","BinaryDiagnosis"]
+include = ['_InitialView-Keyword-Overlap', '_InitialView-Token-Overlap',
+           'studentAnswer-Token-Overlap', '_InitialView-Chunk-Overlap',
+           'studentAnswer-Chunk-Overlap', '_InitialView-Triple-Overlap',
+           'studentAnswer-Triple-Overlap', 'LC_TOKEN-Match', 'LEMMA-Match',
+           'SYNONYM-Match', 'Variety', 'Outcome']
 dependent_variable = include[-1]
 
 model_directory = 'model'
@@ -40,7 +44,19 @@ def predict():
     if clf:
         try:
             json_ = request.json
-            query = pd.get_dummies(pd.DataFrame(json_))
+            data = None
+            
+            if (json_):
+                data = pd.DataFrame(json_)
+            else:
+                # not json, assume XML (CAS XMI)
+                # run feature extraction
+                cas = load_cas_from_xmi(BytesIO(request.data), typesystem=isaac_ts)
+                feats = extraction.run(cas)
+                data = pd.DataFrame.from_items(
+                    [(f[0],[f[1]]) for f in feats])
+            
+            query = pd.get_dummies(data)
 
             # https://github.com/amirziai/sklearnflask/issues/3
             # Thanks to @lorenzori
