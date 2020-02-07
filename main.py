@@ -12,7 +12,6 @@ from features import uima
 from features.extractor import FeatureExtraction
 from cassis.xmi import load_cas_from_xmi
 from io import BytesIO
-from collections import OrderedDict
 
 app = Flask(__name__)
 
@@ -39,12 +38,6 @@ extraction = FeatureExtraction()
 model_columns = None
 clf = None
 
-def listify_values(data: dict) -> OrderedDict:
-    ret = OrderedDict()
-    for key,val in data.items():
-        ret[key] = [val]
-    return ret
-
 @app.route('/predict', methods=['POST'])
 def predict():
     if clf:
@@ -56,11 +49,10 @@ def predict():
                 data = pd.DataFrame(json_)
             else:
                 # not json, assume XML (CAS XMI)
-                # run feature extraction
+                # from_cases feature extraction
                 cas = load_cas_from_xmi(BytesIO(request.data), typesystem=isaac_ts)
-                feats = extraction.run(cas)
-                data = pd.DataFrame.from_dict(
-                    listify_values(feats))
+                feats = extraction.from_cases([cas])
+                data = pd.DataFrame.from_dict(feats)
             
             query = pd.get_dummies(data)
 

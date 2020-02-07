@@ -15,7 +15,7 @@ class ReadCASTestCase(unittest.TestCase):
             cas = load_cas_from_xmi(f, typesystem=final_ts)
         
         extraction = FeatureExtraction()
-        feats = extraction.run(cas)
+        feats = extraction.from_cases([cas])
         
         self.assertIsInstance(feats, OrderedDict)
         self.assertEqual(len(extraction.extractors),

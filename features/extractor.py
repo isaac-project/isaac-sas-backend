@@ -182,5 +182,14 @@ class FeatureExtraction():
                 Outcome()
             ]
     
-    def run(self, cas: Cas) -> OrderedDict:
-        return OrderedDict([x.extract(cas) for x in self.extractors])
+    def from_cases(self, cases: List[Cas]) -> OrderedDict:
+        ret = OrderedDict()
+        
+        for cas in cases:
+            for x in self.extractors:
+                f = x.extract(cas)
+                ret.setdefault(f[0], []).append(f[1])
+                
+        return ret
+                
+                
