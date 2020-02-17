@@ -12,6 +12,13 @@ from features import uima
 from features.extractor import FeatureExtraction
 from cassis.xmi import load_cas_from_xmi
 from io import BytesIO
+from pandas.core.frame import DataFrame
+
+try:
+    from _thread import allocate_lock as Lock
+except:
+    from _dummy_thread import allocate_lock as Lock
+
 
 app = Flask(__name__)
 
@@ -33,10 +40,22 @@ model_columns_file_name = '%s/model_columns.pkl' % model_directory
 isaac_ts = uima.load_isaac_ts() 
 # feature extraction
 extraction = FeatureExtraction()
+# in-memory feature data
+features = {}
+lock = Lock()
 
 # These will be populated at training time
 model_columns = None
 clf = None
+
+def do_prediction(data: DataFrame) -> list:
+    query = pd.get_dummies(data)
+
+    # https://github.com/amirziai/sklearnflask/issues/3
+    # Thanks to @lorenzori
+    query = query.reindex(columns=model_columns, fill_value=0)
+
+    return list(clf.predict(query))
 
 @app.route('/predict', methods=['POST'])
 def predict():
@@ -53,14 +72,8 @@ def predict():
                 cas = load_cas_from_xmi(BytesIO(request.data), typesystem=isaac_ts)
                 feats = extraction.from_cases([cas])
                 data = pd.DataFrame.from_dict(feats)
-            
-            query = pd.get_dummies(data)
 
-            # https://github.com/amirziai/sklearnflask/issues/3
-            # Thanks to @lorenzori
-            query = query.reindex(columns=model_columns, fill_value=0)
-
-            prediction = list(clf.predict(query))
+            prediction = do_prediction(data)
 
             # Converting to int from int64
             return jsonify({"prediction": list(map(int, prediction))})
@@ -72,6 +85,18 @@ def predict():
         print('train first')
         return 'no model here'
 
+@app.route('/addInstance', methods = ['POST'])
+def addInstance():
+    model_id = request.form['modelId']
+    cas = load_cas_from_xmi(BytesIO(request.form['xmi']), typesystem=isaac_ts)
+    feats = extraction.from_cases([cas])
+    with lock:
+        if model_id in features:
+            # merge
+            for name, value in feats.iteritems():
+                features[model_id][name].append(value)
+        else:
+            features[model_id] = feats
 
 @app.route('/train', methods=['GET'])
 def train():
