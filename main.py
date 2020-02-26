@@ -32,8 +32,9 @@ include = ['_InitialView-Keyword-Overlap', '_InitialView-Token-Overlap',
 dependent_variable = include[-1]
 
 model_directory = 'model'
-model_file_name = '%s/model.pkl' % model_directory
-model_columns_file_name = '%s/model_columns.pkl' % model_directory
+#model_file_name = '%s/model.pkl' % model_directory
+
+model_default_name = "default"
 
 # UIMA / features stuff
 # type system
@@ -45,17 +46,19 @@ features = {}
 lock = Lock()
 
 # These will be populated at training time
-model_columns = None
-clf = None
+model_columns = {}
+clf = {}
 
-def do_prediction(data: DataFrame) -> list:
+def do_prediction(data: DataFrame, model_id: str = None) -> list:
     query = pd.get_dummies(data)
-
+    if not model_id:
+        model_id = model_default_name
+    
     # https://github.com/amirziai/sklearnflask/issues/3
     # Thanks to @lorenzori
-    query = query.reindex(columns=model_columns, fill_value=0)
-
-    return list(clf.predict(query))
+    query = query.reindex(columns=model_columns[model_id], fill_value=0)
+    
+    return list(clf[model_id].predict(query))
 
 @app.route('/predict', methods=['POST'])
 def predict():
@@ -88,23 +91,35 @@ def predict():
 @app.route('/addInstance', methods = ['POST'])
 def addInstance():
     model_id = request.form['modelId']
+    if not model_id:
+        model_id = model_default_name
     cas = load_cas_from_xmi(BytesIO(request.form['xmi']), typesystem=isaac_ts)
     feats = extraction.from_cases([cas])
     with lock:
         if model_id in features:
-            # merge
+            # append new features
             for name, value in feats.iteritems():
                 features[model_id][name].append(value)
         else:
             features[model_id] = feats
 
-@app.route('/train', methods=['GET'])
-def train():
+@app.route('/trainFromCASes', methods = ['GET'])
+def trainFromCASes():
+    model_id = request.args.get('modelId')
+    if not model_id:
+        model_id = model_default_name
+    if features[model_id]:
+        data = pd.DataFrame.from_dict(features[model_id])
+        return do_training(data, model_id)
+    else:
+        print('add CAS instances first')
+        return 'no model here with id {}'.format(model_id)
+
+def do_training(df: DataFrame, model_id: str = None) -> str:
     # using random forest as an example
     # can do the training separately and just update the pickles
     from sklearn.ensemble import RandomForestClassifier as rf
-
-    df = pd.read_table(training_data)
+    
     df_ = df[include]
 
     categoricals = []  # going to one-hot encode categorical variables
@@ -121,22 +136,32 @@ def train():
     x = df_ohe[df_ohe.columns.difference([dependent_variable])]
     y = df_ohe[dependent_variable]
 
+    if not model_id:
+        model_id = model_default_name
+
     # capture a list of columns that will be used for prediction
-    global model_columns
-    model_columns = list(x.columns)
-    joblib.dump(model_columns, model_columns_file_name)
+    model_columns_file_name = '{}/{}_columns.pkl'.format(model_directory, model_id)
+    model_columns[model_id] = list(x.columns)
+    joblib.dump(model_columns[model_id], model_columns_file_name)
 
-    global clf
-    clf = rf()
+    # build classifier
+    clf[model_id] = rf()
     start = time.time()
-    clf.fit(x, y)
+    clf[model_id].fit(x, y)
 
-    joblib.dump(clf, model_file_name)
-
+    out_file = '{}/{}.pkl'.format(model_directory, model_id)
+    joblib.dump(clf[model_id], out_file)
+    
     message1 = 'Trained in %.5f seconds' % (time.time() - start)
-    message2 = 'Model training score: %s' % clf.score(x, y)
+    message2 = 'Model training score: %s' % clf[model_id].score(x, y)
     return_message = 'Success. \n{0}. \n{1}.'.format(message1, message2) 
     return return_message
+    
+    
+@app.route('/train', methods=['GET'])
+def train():
+    df = pd.read_table(training_data)
+    return do_training(df, None)
 
 
 @app.route('/wipe', methods=['GET'])
@@ -158,15 +183,20 @@ if __name__ == '__main__':
         port = 80
 
     try:
-        clf = joblib.load(model_file_name)
-        print('model loaded')
-        model_columns = joblib.load(model_columns_file_name)
-        print('model columns loaded')
-
+        for f in os.listdir(model_directory):
+            if f.endswith(".pkl"):
+                if "_columns" in f:
+                    model_id = f[:-12]
+                    model_columns[model_id] = joblib.load('{}_columns.pkl'.format(model_id))
+                    print('model columns {} loaded'.format(f))
+                else:
+                    model_id = f[:-4]
+                    clf[model_id] = joblib.load(f)
+                    print('model {} loaded'.format(model_id))
+                
     except Exception as e:
         print('No model here')
         print('Train first')
         print(str(e))
-        clf = None
-
+        
     app.run(host='0.0.0.0', port=port, debug=True)
