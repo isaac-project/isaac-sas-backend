@@ -167,9 +167,9 @@ def train():
 @app.route('/wipe', methods=['GET'])
 def wipe():
     try:
-        shutil.rmtree('model')
+        shutil.rmtree(model_directory)
         os.makedirs(model_directory)
-        return 'Model wiped'
+        return 'Models wiped'
 
     except Exception as e:
         print(str(e))
@@ -187,11 +187,11 @@ if __name__ == '__main__':
             if f.endswith(".pkl"):
                 if "_columns" in f:
                     model_id = f[:-12]
-                    model_columns[model_id] = joblib.load('{}_columns.pkl'.format(model_id))
-                    print('model columns {} loaded'.format(f))
+                    model_columns[model_id] = joblib.load('{}/{}_columns.pkl'.format(model_directory,model_id))
+                    print('model columns {} loaded'.format(model_id))
                 else:
                     model_id = f[:-4]
-                    clf[model_id] = joblib.load(f)
+                    clf[model_id] = joblib.load('{}/{}.pkl'.format(model_directory,model_id))
                     print('model {} loaded'.format(model_id))
                 
     except Exception as e:
