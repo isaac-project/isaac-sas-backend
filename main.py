@@ -3,7 +3,8 @@ import os
 import shutil
 import time
 import traceback
-
+import base64
+import json
 from flask import Flask, request, jsonify
 import pandas as pd
 from sklearn.externals import joblib
@@ -19,7 +20,6 @@ try:
 except:
     from _dummy_thread import allocate_lock as Lock
 
-
 app = Flask(__name__)
 
 # inputs
@@ -32,13 +32,13 @@ include = ['_InitialView-Keyword-Overlap', '_InitialView-Token-Overlap',
 dependent_variable = include[-1]
 
 model_directory = 'model'
-#model_file_name = '%s/model.pkl' % model_directory
+# model_file_name = '%s/model.pkl' % model_directory
 
 model_default_name = "default"
 
 # UIMA / features stuff
 # type system
-isaac_ts = uima.load_isaac_ts() 
+isaac_ts = uima.load_isaac_ts()
 # feature extraction
 extraction = FeatureExtraction()
 # in-memory feature data
@@ -47,79 +47,103 @@ lock = Lock()
 
 # These will be populated at training time
 model_columns = {}
-clf = {}
+clf = {} # model objects
+
 
 def do_prediction(data: DataFrame, model_id: str = None) -> list:
     query = pd.get_dummies(data)
     if not model_id:
         model_id = model_default_name
-    
+
     # https://github.com/amirziai/sklearnflask/issues/3
     # Thanks to @lorenzori
     query = query.reindex(columns=model_columns[model_id], fill_value=0)
-    
+
     return list(clf[model_id].predict(query))
+
 
 @app.route('/predict', methods=['POST'])
 def predict():
     if clf:
-        try:
-            json_ = request.json
-            data = None
-            
-            if (json_):
-                data = pd.DataFrame(json_)
-            else:
-                # not json, assume XML (CAS XMI)
-                # from_cases feature extraction
-                cas = load_cas_from_xmi(BytesIO(request.data), typesystem=isaac_ts)
-                feats = extraction.from_cases([cas])
-                data = pd.DataFrame.from_dict(feats)
+    #try: # todo: maybe uncomment and try running it again ?
+        json_ = request.json
+        model_id_ = json.dumps(json_["modelId"]).replace('\"', '')
+        base64_cas = base64.b64decode(json.dumps(json_["cas"]))
 
-            prediction = do_prediction(data)
+        # TODO: maybe check if modelId is in models, if not, do not proceed? See if the error gets passed on to REST service
+        if model_id not in clf:
+            return "Model with modelId \"{}\" has not been trained yet. Please train first".format(model_id_)
 
-            # Converting to int from int64
-            return jsonify({"prediction": list(map(int, prediction))})
+        #print("printing deseralized and decoded base64 string: ", base64_cas)
+        print("printing deseralized json cas modelID: ", model_id_)
 
-        except Exception as e:
+        # from_cases feature extraction
+        cas = load_cas_from_xmi(BytesIO(base64_cas), typesystem=isaac_ts)
+        print("loaded the cas...")
+        feats = extraction.from_cases([cas])
+        print("extracted feats")
+        data = pd.DataFrame.from_dict(feats)
+        prediction = do_prediction(data, model_id_)
 
-            return jsonify({'error': str(e), 'trace': traceback.format_exc()})
+        # Converting to int from int64
+        print(jsonify({"prediction": list(map(int, prediction))}))
+        return jsonify({"prediction": list(map(int, prediction))})
+
+        #except Exception as e:
+            #return jsonify({'error': str(e), 'trace': traceback.format_exc()})
     else:
         print('train first')
         return 'no model here'
 
-@app.route('/addInstance', methods = ['POST'])
+
+@app.route('/addInstance', methods=['POST'])
 def addInstance():
-    model_id = request.form['modelId']
-    if not model_id:
-        model_id = model_default_name
-    cas = load_cas_from_xmi(BytesIO(request.form['xmi']), typesystem=isaac_ts)
+    try:
+        json_cas = request.json
+    except Exception as e:
+        return jsonify({'error': str(e), 'trace': traceback.format_exc()})
+
+    model_id = json.dumps(json_cas["modelId"])
+    base64_string = base64.b64decode(json.dumps(json_cas["cas"]))
+
+    # TODO: for some reason the modelId was decoded with quotation marks around the string
+    model_id = model_id.replace('\"', '')
+
+    if not model_id: # todo: changed b/c there should always be a modelId
+        # model_id = model_default_name
+        return 'No model id passed as argument. Please include a modelId', 400
+
+    cas = load_cas_from_xmi(BytesIO(base64_string), typesystem=isaac_ts)
     feats = extraction.from_cases([cas])
     with lock:
         if model_id in features:
             # append new features
-            for name, value in feats.iteritems():
+            for name, value in feats.items():
                 features[model_id][name].append(value)
         else:
             features[model_id] = feats
 
-@app.route('/trainFromCASes', methods = ['GET'])
+    return "Successfully added cas to model {}".format(model_id)
+
+
+@app.route('/trainFromCASes', methods=['GET'])
 def trainFromCASes():
     model_id = request.args.get('modelId')
-    if not model_id:
-        model_id = model_default_name
+    if not model_id: # todo: changed b/c there should always be a modelId
+        # model_id = model_default_name
+        return 'No model id passed as argument. Please include a modelId', 400
     if features[model_id]:
         data = pd.DataFrame.from_dict(features[model_id])
         return do_training(data, model_id)
     else:
         print('add CAS instances first')
-        return 'no model here with id {}'.format(model_id)
+        return 'No model here with id {}'.format(model_id) + '. Add CAS instances first.'
 
 def do_training(df: DataFrame, model_id: str = None) -> str:
     # using random forest as an example
     # can do the training separately and just update the pickles
     from sklearn.ensemble import RandomForestClassifier as rf
-    
+    print(df[include])
     df_ = df[include]
 
     categoricals = []  # going to one-hot encode categorical variables
@@ -151,15 +175,16 @@ def do_training(df: DataFrame, model_id: str = None) -> str:
 
     out_file = '{}/{}.pkl'.format(model_directory, model_id)
     joblib.dump(clf[model_id], out_file)
-    
+
     message1 = 'Trained in %.5f seconds' % (time.time() - start)
     message2 = 'Model training score: %s' % clf[model_id].score(x, y)
-    return_message = 'Success. \n{0}. \n{1}.'.format(message1, message2) 
+    return_message = 'Success. \n{0}. \n{1}.'.format(message1, message2)
     return return_message
-    
-    
+
+
 @app.route('/train', methods=['GET'])
 def train():
+    print("Training")
     df = pd.read_table(training_data)
     return do_training(df, None)
 
@@ -187,16 +212,16 @@ if __name__ == '__main__':
             if f.endswith(".pkl"):
                 if "_columns" in f:
                     model_id = f[:-12]
-                    model_columns[model_id] = joblib.load('{}/{}_columns.pkl'.format(model_directory,model_id))
+                    model_columns[model_id] = joblib.load('{}/{}_columns.pkl'.format(model_directory, model_id))
                     print('model columns {} loaded'.format(model_id))
                 else:
                     model_id = f[:-4]
-                    clf[model_id] = joblib.load('{}/{}.pkl'.format(model_directory,model_id))
+                    clf[model_id] = joblib.load('{}/{}.pkl'.format(model_directory, model_id))
                     print('model {} loaded'.format(model_id))
-                
+
     except Exception as e:
         print('No model here')
         print('Train first')
         print(str(e))
-        
+
     app.run(host='0.0.0.0', port=port, debug=True)
