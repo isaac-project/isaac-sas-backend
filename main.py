@@ -67,8 +67,8 @@ def predict():
     if clf:
     #try: # todo: maybe uncomment and try running it again ?
         json_ = request.json
-        model_id_ = json.dumps(json_["modelId"]).replace('\"', '')
-        base64_cas = base64.b64decode(json.dumps(json_["cas"]))
+        model_id_ = json_["modelId"]
+        base64_cas = base64.b64decode(json_["cas"])
 
         # TODO: maybe check if modelId is in models, if not, do not proceed? See if the error gets passed on to REST service
         if model_id not in clf:
@@ -103,11 +103,11 @@ def addInstance():
     except Exception as e:
         return jsonify({'error': str(e), 'trace': traceback.format_exc()})
 
-    model_id = json.dumps(json_cas["modelId"])
-    base64_string = base64.b64decode(json.dumps(json_cas["cas"]))
+    model_id = json_cas["modelId"]
+    base64_string = base64.b64decode(json_cas["cas"])
 
     # TODO: for some reason the modelId was decoded with quotation marks around the string
-    model_id = model_id.replace('\"', '')
+    #model_id = model_id.replace('\"', '')
 
     if not model_id: # todo: changed b/c there should always be a modelId
         # model_id = model_default_name
@@ -165,13 +165,15 @@ def do_training(df: DataFrame, model_id: str = None) -> str:
 
     # capture a list of columns that will be used for prediction
     model_columns_file_name = '{}/{}_columns.pkl'.format(model_directory, model_id)
-    model_columns[model_id] = list(x.columns)
+    with lock:
+        model_columns[model_id] = list(x.columns)
     joblib.dump(model_columns[model_id], model_columns_file_name)
 
     # build classifier
-    clf[model_id] = rf()
-    start = time.time()
-    clf[model_id].fit(x, y)
+    with lock:
+        clf[model_id] = rf()
+        start = time.time()
+        clf[model_id].fit(x, y)
 
     out_file = '{}/{}.pkl'.format(model_directory, model_id)
     joblib.dump(clf[model_id], out_file)
