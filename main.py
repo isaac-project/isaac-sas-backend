@@ -74,7 +74,6 @@ def predict():
         if model_id not in clf:
             return "Model with modelId \"{}\" has not been trained yet. Please train first".format(model_id_)
 
-        #print("printing deseralized and decoded base64 string: ", base64_cas)
         print("printing deseralized json cas modelID: ", model_id_)
 
         # from_cases feature extraction
@@ -89,8 +88,6 @@ def predict():
         print(jsonify({"prediction": list(map(int, prediction))}))
         return jsonify({"prediction": list(map(int, prediction))})
 
-        #except Exception as e:
-            #return jsonify({'error': str(e), 'trace': traceback.format_exc()})
     else:
         print('train first')
         return 'no model here'
@@ -98,19 +95,11 @@ def predict():
 
 @app.route('/addInstance', methods=['POST'])
 def addInstance():
-    try:
-        json_cas = request.json
-    except Exception as e:
-        return jsonify({'error': str(e), 'trace': traceback.format_exc()})
-
+    json_cas = request.json
     model_id = json_cas["modelId"]
     base64_string = base64.b64decode(json_cas["cas"])
 
-    # TODO: for some reason the modelId was decoded with quotation marks around the string
-    #model_id = model_id.replace('\"', '')
-
     if not model_id: # todo: changed b/c there should always be a modelId
-        # model_id = model_default_name
         return 'No model id passed as argument. Please include a modelId', 400
 
     cas = load_cas_from_xmi(BytesIO(base64_string), typesystem=isaac_ts)
@@ -119,7 +108,8 @@ def addInstance():
         if model_id in features:
             # append new features
             for name, value in feats.items():
-                features[model_id][name].append(value)
+                print("Printing value inside addInstance: ", value)
+                features[model_id][name].append(value[0])
         else:
             features[model_id] = feats
 
@@ -133,7 +123,9 @@ def trainFromCASes():
         # model_id = model_default_name
         return 'No model id passed as argument. Please include a modelId', 400
     if features[model_id]:
+        print("type of features[model_id] in trainFromCASes: ", type(features[model_id]))
         data = pd.DataFrame.from_dict(features[model_id])
+        print("type of data in trainFromCASes (after DataFrame.from_dict: ", type(data))
         return do_training(data, model_id)
     else:
         print('add CAS instances first')
@@ -143,7 +135,6 @@ def do_training(df: DataFrame, model_id: str = None) -> str:
     # using random forest as an example
     # can do the training separately and just update the pickles
     from sklearn.ensemble import RandomForestClassifier as rf
-    print(df[include])
     df_ = df[include]
 
     categoricals = []  # going to one-hot encode categorical variables
@@ -156,7 +147,6 @@ def do_training(df: DataFrame, model_id: str = None) -> str:
 
     # get_dummies effectively creates one-hot encoded variables
     df_ohe = pd.get_dummies(df_, columns=categoricals, dummy_na=True)
-
     x = df_ohe[df_ohe.columns.difference([dependent_variable])]
     y = df_ohe[dependent_variable]
 
@@ -181,6 +171,7 @@ def do_training(df: DataFrame, model_id: str = None) -> str:
     message1 = 'Trained in %.5f seconds' % (time.time() - start)
     message2 = 'Model training score: %s' % clf[model_id].score(x, y)
     return_message = 'Success. \n{0}. \n{1}.'.format(message1, message2)
+    print(return_message)
     return return_message
 
 
