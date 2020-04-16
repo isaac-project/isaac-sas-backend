@@ -112,7 +112,7 @@ def addInstance():
                 features[model_id][name].append(value[0])
         else:
             features[model_id] = feats
-
+    print("Successfully added cas to model {}".format(model_id))
     return "Successfully added cas to model {}".format(model_id)
 
 
