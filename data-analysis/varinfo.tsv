@@ -1,0 +1,545 @@
+	variable_codebook	prompt	targets_value	targets	non_targets
+0	EL103a	The purpose of the commercial is to encourage you to ...	2	nur das 2. Kästchen wurde angekreuzt: b)	1 1. Kästchen wurde angekreuzt 3 3. Kästchen wurde angekreuzt 4 4. Kästchen wurde angekreuzt 
+1	EL105a	1. On the customer service helpline, one of the things you can do is ...	1	place a new order • check on an existing order	0 alle anderen Antworten
+2	EL105b	2. To get technical information, you should first ...	1	(visit the)/(go to the company`s) website • www. • internet • resepol.kom	0 alle anderen Antworten
+3	EL114a	1. German food is also unhealthy because it is often ...	3	nur das 3. Kästchen wurde angekreuzt: c)	1 1. Kästchen wurde angekreuzt 2 2. Kästchen wurde angekreuzt 4 4. Kästchen wurde angekreuzt 
+4	EL114b	2. Today's English food is clearly influenced by ...	2	nur das 2. Kästchen wurde angekreuzt: b)	1 1. Kästchen wurde angekreuzt 3 3. Kästchen wurde angekreuzt 4 4. Kästchen wurde angekreuzt 
+5	EL114c	3. The traditional Sunday roast is often served with ...	1	nur das 1. Kästchen wurde angekreuzt: a)	2 2. Kästchen wurde angekreuzt 3 3. Kästchen wurde angekreuzt 4 4. Kästchen wurde angekreuzt 
+6	EL114d	"4. A particularly common ""English"" meal is ..."	4	nur das 4. Kästchen wurde angekreuzt: d)	1 1. Kästchen wurde angekreuzt 2 2. Kästchen wurde angekreuzt 3 3. Kästchen wurde angekreuzt 
+7	EL114e	5. Laura loves to go to Chinese restaurants if there is ...	2	nur das 2. Kästchen wurde angekreuzt: b)	1 1. Kästchen wurde angekreuzt 3 3. Kästchen wurde angekreuzt 4 4. Kästchen wurde angekreuzt 
+8	EL117aa	1. Paddington Station	1	angekreuzt	0 nicht angekreuzt
+9	EL117ab	1. Paddington Station	0	nicht angekreuzt	1 angekreuzt
+10	EL117ac	1. Paddington Station	0	nicht angekreuzt	1 angekreuzt
+11	EL117ad	1. Paddington Station	0	nicht angekreuzt	1 angekreuzt
+12	EL117ae	1. Paddington Station	0	nicht angekreuzt	1 angekreuzt
+13	EL117af	1. Paddington Station	1	angekreuzt	0 nicht angekreuzt
+14	EL117ag	1. Paddington Station	0	nicht angekreuzt	1 angekreuzt
+15	EL117ba	2. Oxford Circus	1	angekreuzt	0 nicht angekreuzt
+16	EL117bb	2. Oxford Circus	0	nicht angekreuzt	1 angekreuzt
+17	EL117bc	2. Oxford Circus	0	nicht angekreuzt	1 angekreuzt
+18	EL117bd	2. Oxford Circus	0	nicht angekreuzt	1 angekreuzt
+19	EL117be	2. Oxford Circus	0	nicht angekreuzt	1 angekreuzt
+20	EL117bf	2. Oxford Circus	0	nicht angekreuzt	1 angekreuzt
+21	EL117bg	2. Oxford Circus	1	angekreuzt	0 nicht angekreuzt
+22	EL117ca	3. Liverpool Street	0	nicht angekreuzt	1 angekreuzt
+23	EL117cb	3. Liverpool Street	1	angekreuzt	0 nicht angekreuzt
+24	EL117cc	3. Liverpool Street	0	nicht angekreuzt	1 angekreuzt
+25	EL117cd	3. Liverpool Street	1	angekreuzt	0 nicht angekreuzt
+26	EL117ce	3. Liverpool Street	1	angekreuzt	0 nicht angekreuzt
+27	EL117cf	3. Liverpool Street	1	angekreuzt	0 nicht angekreuzt
+28	EL117cg	3. Liverpool Street	0	nicht angekreuzt	1 angekreuzt 
+29	EL118a	1. What is the name of the iceberg?	1	B 15  • V 15 • Bee 15	0 alle anderen Antworten
+30	EL118b	2. How long is the iceberg?	1	186 miles  • one hundred eighty six miles •  hundred eighty six miles • 186 mile	0 alle anderen Antworten
+31	EL118c	3. How much of it is above the water?	1	90 feet  • 90 feets • 90 foot	0 alle anderen Antworten
+32	EL118d	4. How deep does it go down into the water?	1	1300 feet  • 1300 foot	0 alle anderen Antworten
+33	EL118e	5. Into how many pieces did it break?	1	4  • into four pieces • 4 pieses	0 alle anderen Antworten
+34	EL118f	6. How many years could pass before it gets a challenger?	1	hundreds of years  • hundreds  • 100s • 100 of years • hundret of years	0 alle anderen Antworten 
+35	EL121a	1. When did the first Rock Challenge in Dresten take place?	1	4 years ago  • before 4 years	0 alle anderen Antworten
+36	EL121c	2. How old are the students who take part?	1	11-18  • 11-18 years old  • 11 till 18	0 alle anderen Antworten
+37	EL121da	3. In which areas do students get help? Name two more.	1	sound drama dance costumes	0 alle anderen Antworten
+38	EL121db	3. In which areas do students get help? Name two more.	1	sound drama dance costumes	0 alle anderen Antworten
+39	EL121e	4. In which city did the first Rock Challenge take place?	1	Sydney  • sydney • sidney	0 alle anderen Antworten
+40	EL121ga	5. Name three places where Rock Challenge is held in addiotion to the UK and Germany.	1	Australia USA South Africa New Zealand Ireland Tokio Dubai	0 alle anderen Antworten • Africa
+41	EL121gb	5. Name three places where Rock Challenge is held in addiotion to the UK and Germany.	1	Australia USA South Africa New Zealand Ireland Tokio Dubai	0 alle anderen Antworten • Africa
+42	EL121gc	5. Name three places where Rock Challenge is held in addiotion to the UK and Germany.	1	Australia USA South Africa New Zealand Ireland Tokio Dubai	0 alle anderen Antworten • Africa
+43	EL121h	6. What do all the participants in the event avoid?	1	(no) drugs/drug-free ODER (no) alcohol/alcohol free ODER (no) smoke/(no) cigarettes  • drugfree	0 alle anderen Antworten 
+44	EL124aa	1. Report from Vermont	09	i/I 12 l/L	01 a/A 02 b/B 03 c/C 04 d/D 05 e/E 06 f/F 07 g/G 08 h/H 10 j/J 11 k/K
+45	EL124ab	1. Report from Vermont	09	i/I 12 l/L	01 a/A 02 b/B 03 c/C 04 d/D 05 e/E 06 f/F 07 g/G 08 h/H 10 j/J 11 k/K
+46	EL124ba	2. Report from Luisiana	05	e/E 11 k/K	01 a/A 02 b/B 03 c/C 04 d/D 06 f/F 07 g/G 08 h/H 09 i/I 10 j/J 12 l/L
+47	EL124bb	2. Report from Luisiana	05	e/E 11 k/K	01 a/A 02 b/B 03 c/C 04 d/D 06 f/F 07 g/G 08 h/H 09 i/I 10 j/J 12 l/L
+48	EL124ca	3. Report from Wisconsin	01	a/A 08 h/H	02 b/B 03 c/C 04 d/D 05 e/E 06 f/F 07 g/G 09 i/I 10 j/J 11 k/K 12 l/L
+49	EL124cb	3. Report from Wisconsin	01	a/A 08 h/H	02 b/B 03 c/C 04 d/D 05 e/E 06 f/F 07 g/G 09 i/I 10 j/J 11 k/K 12 l/L
+50	EL124da	4. Report from Chicago	02	b/B 06 f/F	01 a/A 03 c/C 04 d/D 05 e/E 07 g/G 08 h/H 09 i/I 10 j/J 11 k/K 12 l/L
+51	EL124db	4. Report from Chicago	02	b/B 06 f/F	01 a/A 03 c/C 04 d/D 05 e/E 07 g/G 08 h/H 09 i/I 10 j/J 11 k/K 12 l/L 
+52	EL140a	1. Lancaster University belongs to a small number of universities that has ...	1	nur das 1. Kästchen wurde angekreuzt: a)	2 2. Kästchen wurde angekreuzt 3 3. Kästchen wurde angekreuzt 4 4. Kästchen wurde angekreuzt 
+53	EL140b	2. The different parts of the University are called after ...	4	nur das 4. Kästchen wurde angekreuzt: d)	1 1. Kästchen wurde angekreuzt 2 2. Kästchen wurde angekreuzt 3 3. Kästchen wurde angekreuzt 
+54	EL140c	3. The name Bowland originally comes from a ...	3	nur das 3. Kästchen wurde angekreuzt: c)	1 1. Kästchen wurde angekreuzt 2 2. Kästchen wurde angekreuzt 4 4. Kästchen wurde angekreuzt 
+55	EL140d	4. Located to the north of Lancaster there used to be ...	2	nur das 2. Kästchen wurde angekreuzt: b)	1 1. Kästchen wurde angekreuzt 3 3. Kästchen wurde angekreuzt 4 4. Kästchen wurde angekreuzt 
+56	EL140e	5. To the south of Lancaster there is an area called ...	4	nur das 4. Kästchen wurde angekreuzt: d)	1 1. Kästchen wurde angekreuzt 2 2. Kästchen wurde angekreuzt 3 3. Kästchen wurde angekreuzt 
+57	EL142a	1. Why can't Anthony come and pick her up?	1	baby-sit  • he has to baby-sit	0 alle anderen Antworten
+58	EL142b	2. Why is Lindsey worried?	1	doesn’t know the locality  • never been to Coventry • hasn’t got his address • doesn’t know where she is • doesn’t know where she has to go• fear not to find way	0 alle anderen Antworten
+59	EL142c	3. Where is Lindsey during the phone call?	1	station  • outside main station • at station	0 alle anderen Antworten
+60	EL142d	4. How far away is Anthony's house?	1	150 m  • 150 metres	0 alle anderen Antworten • 150
+61	EL142e	5. Where does she have to go first?	1	turn left • to the statue	0 alle anderen Antworten
+62	EL142g	6. What can Lindsey see next to her friend's house?	1	post box  • mail box • letter box • red letter box	0 alle anderen Antworten 
+63	EL143a	Die folgenden vier Elemente müssen in der Notiz genannt werden. Die Reihenfolge des Auftretens der Elemente in der Notiz ist dabei egal.	1	Joey called • call from Joey • Joey • Joey • johy • Joy • Joie • joe • Joi	0 Element 1 ist nicht vorhanden oder falscher Name wiedergegeben.
+64	EL143b	Die folgenden vier Elemente müssen in der Notiz genannt werden. Die Reihenfolge des Auftretens der Elemente in der Notiz ist dabei egal.	1	can’t play football • cannot make it • cannot make it tonight • supposed to play football • cannot come tonight	0 Element 2 nicht vorhanden oder sinnverfälschend wiedergegeben. • She can´t make it.
+65	EL143c	Die folgenden vier Elemente müssen in der Notiz genannt werden. Die Reihenfolge des Auftretens der Elemente in der Notiz ist dabei egal.	1	needs his football shirt • needs his Celtic football shirt • wants his jersey • needs Jersy	0 Element 3 nicht vorhanden oder sinnverfälschend wiedergegeben. • needs celtic • Tom needs jersey
+66	EL143d	Die folgenden vier Elemente müssen in der Notiz genannt werden. Die Reihenfolge des Auftretens der Elemente in der Notiz ist dabei egal.	1	0873573332 • zero eight seven three five seven three three three two	0 Element 4 nicht vorhanden oder Telefonnummer falsch wiedergegeben. 
+67	EL146a	1. Which films would Betty like to watch?	4	nur das 4. Kästchen wurde angekreuzt: d)	1 1. Kästchen wurde angekreuzt 2 2. Kästchen wurde angekreuzt 3 3. Kästchen wurde angekreuzt 
+68	EL146b	2. Why doesn't Claudia want to go to the cinema?	3	nur das 3. Kästchen wurde angekreuzt: c)	1 1. Kästchen wurde angekreuzt 2 2. Kästchen wurde angekreuzt 4 4. Kästchen wurde angekreuzt 
+69	EL146c	3. Where would Claudia like to go instead?	1	nur das 1. Kästchen wurde angekreuzt: a)	2 2. Kästchen wurde angekreuzt 3 3. Kästchen wurde angekreuzt 4 4. Kästchen wurde angekreuzt 
+70	EL146d	4. Why doesnt Betty want to go there?	4	nur das 4. Kästchen wurde angekreuzt: d)	1 1. Kästchen wurde angekreuzt 2 2. Kästchen wurde angekreuzt 3 3. Kästchen wurde angekreuzt 
+71	EL146e	5. Where do Betty and Claudia go in the end?	1	nur das 1. Kästchen wurde angekreuzt: a)	2 2. Kästchen wurde angekreuzt 3 3. Kästchen wurde angekreuzt 4 4. Kästchen wurde angekreuzt 
+72	EL146f	6. What helps Betty and Claudia to make a final decision?	2	nur das 2. Kästchen wurde angekreuzt: b)	1 1. Kästchen wurde angekreuzt 3 3. Kästchen wurde angekreuzt 4 4. Kästchen wurde angekreuzt 
+73	EL150a	1. What's the new address?	3	nur das 3. Kästchen wurde angekreuzt: c)	1 1. Kästchen wurde angekreuzt 2 2. Kästchen wurde angekreuzt 4 4. Kästchen wurde angekreuzt 
+74	EL150b	2. When will the office be open again?	2	nur das 2. Kästchen wurde angekreuzt: b)	1 1. Kästchen wurde angekreuzt 3 3. Kästchen wurde angekreuzt 4 4. Kästchen wurde angekreuzt 
+75	EL150c	3. What's the new telephone number?	3	nur das 3. Kästchen wurde angekreuzt: c)	1 1. Kästchen wurde angekreuzt 2 2. Kästchen wurde angekreuzt 4 4. Kästchen wurde angekreuzt 
+76	EL159a	1. What do visitors need in order to enjoy the Scottish countryside?	1	good weather  • nice weather • sunshine	0 alle anderen Antworten
+77	EL159b	2. What are people in Scotland really like?	1	open • not mean • generous	0 alle anderen Antworten
+78	EL159c	3. Which town does the speaker like best?	1	Glasgow  • glasgo	0 alle anderen Antworten
+79	EL159d	4. Name one thing you can do on your visit to Scotland.	1	go shopping • shop • museums • beautiful houses • famous houses beautiful architecture • famous architecture • museum	0 alle anderen Antworten • houses • architecture • architect • fitness, museums
+80	EL159e	5. What was Mr Mackintosh's job?	1	architect	0 alle anderen Antworten 
+81	EL160a	1. What time of the year was it?	3	nur das 3. Kästchen wurde angekreuzt: c)	1 1. Kästchen wurde angekreuzt 2 2. Kästchen wurde angekreuzt 4 4. Kästchen wurde angekreuzt 
+82	EL160b	2. What is her favourite German town?	2	nur das 2. Kästchen wurde angekreuzt: b)	1 1. Kästchen wurde angekreuzt 3 3. Kästchen wurde angekreuzt 4 4. Kästchen wurde angekreuzt 
+83	EL160c	3. How does she describe the Germans?	3	nur das 3. Kästchen wurde angekreuzt: c)	1 1. Kästchen wurde angekreuzt 2 2. Kästchen wurde angekreuzt 4 4. Kästchen wurde angekreuzt 
+84	EL160d	4. What has she got in Schleswig-Holstein?	4	nur das 4. Kästchen wurde angekreuzt: d)	1 1. Kästchen wurde angekreuzt 2 2. Kästchen wurde angekreuzt 3 3. Kästchen wurde angekreuzt 
+85	EL160e	5. Where did she learn German?	2	nur das 2. Kästchen wurde angekreuzt: b)	1 1. Kästchen wurde angekreuzt 3 3. Kästchen wurde angekreuzt 4 4. Kästchen wurde angekreuzt 
+86	EL160f	6. What does she think about German food?	1	nur das 1. Kästchen wurde angekreuzt: a)	2 2. Kästchen wurde angekreuzt 3 3. Kästchen wurde angekreuzt 4 4. Kästchen wurde angekreuzt 
+87	EL162a	Limerick 1	04	d/D	01 a/A 02 b/B 03 c/C 05 e/E 06 f/F
+88	EL162b	Limerick 2	01	a/A	02 b/B 03 c/C 04 d/D 05 e/E 06 f/F
+89	EL162c	Limerick 3	06	f/F	01 a/A 02 b/B 03 c/C 04 d/D 05 e/E
+90	EL162d	Limerick 4	02	b/B	01 a/A 03 c/C 04 d/D 05 e/E 06 f/F 
+91	EL163a	1. Room number	1	301  • threee-o-one	0 alle anderen Antworten
+92	EL163b	2. What is the problem in Mr Mosely's room?	1	no hot water  • no hot water •  no hot running water • wants hot water • needs hot water • no boiled water • no warm water • cold water	0 alle anderen Antworten
+93	EL163c	3. Why does the man need someone to come to his room quickly?	1	meeting this morning  • meeting in the morning	0 alle anderen Antworten
+94	EL163d	4. Room number	1	902  • nine-o-two	0 alle anderen Antworten
+95	EL163e	5. What is the problem in the woman's room?	1	bed hasn’t been changed  • wants new beding • new beding • no fresh towels • wants fresh towels • wants new towels  • fresh towels • new towels  • beding	0 alle anderen Antworten • bed (zu unspezifisch) • towels • Beth aren’t ok
+96	EL163f	6. When will the hotel solve the problem?	1	immediately • now • directly • within the hour  • imediately	0 alle anderen Antworten
+97	EL163g	7. Room number	1	207  • two-o-sewen	0 alle anderen Antworten
+98	EL163h	8. What is the problem in Mr Doyle's room?	1	horrible pillows • terrible pillows • new pillows • wants new pillows • soft pillows • pillows too soft	0 alle anderen Antworten • pillows
+99	EL163i	9. When did he fist talk to the hotel about his problem?	1	yesterday  • last night • previous night • previous day • day before • night before	0 alle anderen Antworten 
+100	EL165aa	1. Name two types of food which helped the speaker know what season it was. a)	1	fresh flowers ODER flowers • strawberries • new potatoes ODER potatoes • English tomatoes ODER tomatoes	0 alle anderen Antworten
+101	EL165ab	1. Name two types of food which helped the speaker know what season it was. b)	1	fresh flowers ODER flowers • strawberries • new potatoes ODER potatoes • English tomatoes ODER tomatoes	0 alle anderen Antworten
+102	EL165b	2. Each year, the first tomatoes came from...	1	the Channel Islands • Channel Islands • Jersey  • channel island • jersei	0 alle anderen Antworten
+103	EL165c	3. The speaker and his mum ate the tomatoes as though they were...	1	apples  • aple	0 alle anderen Antworten
+104	EL165d	4. The number of tomatoes grown and eaten in England is...	1	a quarter  • one fourth • ¼ • 25%	0 alle anderen Antworten
+105	EL165e	5. Recently, the amount of tomatoes produced has decreased by...	1	half  • ½ • 50%	0 alle anderen Antworten
+106	EL165f	6. This year the percent of outdoor tomatoes will drop to...	1	none  • 0 • no tomatoes • sero	0 alle anderen Antworten 
+107	EL171a	1. The beasts consist of a number of...	1	different creatures	0 alle anderen Antworten
+108	EL171b	2. They were placed at the entrance...	1	of a city • of a palace • a city • a palace	0 alle anderen Antworten
+109	EL171c	3. The lion legs demonstrate...	1	strength	0 alle anderen Antworten
+110	EL171d	4. These figures seem to express that they are...	1	not afraid	0 alle anderen Antworten
+111	EL171e	5. A strange feature of these animals is the...	1	number of legs	0 alle anderen Antworten 
+112	EL172a	What does the commercial ask the listeners to do?	3	nur das 3. Kästchen wurde angekreuzt: c)	1 1. Kästchen wurde angekreuzt 2 2. Kästchen wurde angekreuzt 4 4. Kästchen wurde angekreuzt 
+113	EL176a	(1) first name - father	1	Lorenzo • Lorenco • Lorenso • David • Davide • Zenetti • Cenety • Zenati • Zenatti  • lorenzo • david • ceneti	0 alle anderen Antworten
+114	EL176b	(2) origin - father	1	Italian • from Italy • Italy  • italian • itelian • Itali	0 alle anderen Antworten
+115	EL176c	(3) job - mother	1	housewife • mother  • housewife and mother • house wife • housewive	0 alle anderen Antworten • wife • houswoman
+116	EL176d	(4) job - father	1	businessman  • bussinesman • businesman	0 alle anderen Antworten
+117	EL176f	(5) cooking - mother	1	French cuisine • French • French cooking  • french • France • france	0 alle anderen Antworten 
+118	EL201a	What is the main message of the radio spot?	3	nur das 3. Kästchen wurde angekreuzt: c)	1 1. Kästchen wurde angekreuzt 2 2. Kästchen wurde angekreuzt 4 4. Kästchen wurde angekreuzt 
+119	EL202a	2. Second picture	2	nur das 2. Kästchen wurde angekreuzt: b)	1 1. Kästchen wurde angekreuzt 3 3. Kästchen wurde angekreuzt 
+120	EL202b	2. Third picture	2	nur das 2. Kästchen wurde angekreuzt: b)	1 1. Kästchen wurde angekreuzt 3 3. Kästchen wurde angekreuzt 
+121	EL202c	3. Fourth picture	3	nur das 3. Kästchen wurde angekreuzt: c)	1 1. Kästchen wurde angekreuzt 2 2. Kästchen wurde angekreuzt 
+122	EL202d	4. Fifth picture	2	nur das 2. Kästchen wurde angekreuzt: b)	1 1. Kästchen wurde angekreuzt 3 3. Kästchen wurde angekreuzt 
+123	EL202e	5. Last picture	3	nur das 3. Kästchen wurde angekreuzt: c)	1 1. Kästchen wurde angekreuzt 2 2. Kästchen wurde angekreuzt 
+124	EL208a		06	f/F	01 a/A 02 b/B 03 c/C 04 d/D 05 e/E 07 g/G
+125	EL208b		01	a/A	02 b/B 03 c/C 04 d/D 05 e/E 06 f/F 07 g/G
+126	EL208c		07	g/G	01 a/A 02 b/B 03 c/C 04 d/D 05 e/E 06 f/F
+127	EL208d		05	e/E	01 a/A 02 b/B 03 c/C 04 d/D 06 f/F 07 g/G
+128	EL208e		04	d/D	01 a/A 02 b/B 03 c/C 05 e/E 06 f/F 07 g/G 
+129	EL210a	What is the podcast about? It is about	4	nur das 4. Kästchen wurde angekreuzt: d)	1 1. Kästchen wurde angekreuzt 2 2. Kästchen wurde angekreuzt 3 3. Kästchen wurde angekreuzt 
+130	EL361a	1. In the city you can find ... (Name one)	1	two universities • universities • shops • lively city centre	0 alle anderen Antworten • university • shop
+131	EL361b	2. Around the city there are ...	1	fields • forests • mountains	0 alle anderen Antworten • field • forest • mountain
+132	EL361c	3. In the past Aberdeen was famous for its ...	1	harbour • fishing • fishing industry	0 alle anderen Antworten
+133	EL361d	4. Today Abardeen is well-off because of its ... (Name one)	1	oil • industry • north sea oil • north sea industry • offshore oil rigs	0 alle anderen Antworten
+134	EL361e	5. In Aberdeen there is a lot of work for ...	1	engineers	0 alle anderen Antworten 
+135	EL377a	1. What was one of the main problems with the streets?	4	nur das 4. Kästchen wurde angekreuzt: d)	1 1. Kästchen wurde angekreuzt 2 2. Kästchen wurde angekreuzt 3 3. Kästchen wurde angekreuzt 
+136	EL377b	2. What can a Sedan Chair be compared to today?	1	nur das 1. Kästchen wurde angekreuzt: a)	2 2. Kästchen wurde angekreuzt 3 3. Kästchen wurde angekreuzt 4 4. Kästchen wurde angekreuzt 
+137	EL377c	3. Where would people put a Sedan Chair?	3	nur das 3. Kästchen wurde angekreuzt: c)	1 1. Kästchen wurde angekreuzt 2 2. Kästchen wurde angekreuzt 4 4. Kästchen wurde angekreuzt 
+138	EL378a	1. What team does the Junior Team play against?	1	New York	0 alle anderen Antworten
+139	EL378b	2. How many people are on the Junior Team?	1	13 • 13 boys	0 alle anderen Antworten
+140	EL378c	3. What day will they meet?	1	Saturday	0 alle anderen Antworten
+141	EL378d	4. When will the girls talk again on the phone?	1	7:30 • 19.30	0 alle anderen Antworten 
+142	EL549a	1. Place of birth	1	Canada	0 alle anderen Antworten
+143	EL549b	2. Hair color	1	brown	0 alle anderen Antworten
+144	EL549c	3. School subject she likes	1	history	0 alle anderen Antworten
+145	EL549d	4. Sport she plays with her dad	1	basketball	0 alle anderen Antworten
+146	EL549e	5. Favorite film	1	Harry Potter (Half-Blood  Prince)	0 alle anderen Antworten 
+147	EL625a	1. Kate was on an exchange in the US for ...	2	nur das 2. Kästchen wurde angekreuzt: b)	1 1. Kästchen wurde angekreuzt 3 3. Kästchen wurde angekreuzt 4 4. Kästchen wurde angekreuzt 
+148	EL625b	2. Before her exchange, Kate had ...	04	nur das 4. Kästchen wurde angekreuzt: d)	01 1. Kästchen wurde angekreuzt 02 2. Kästchen wurde angekreuzt 03 3. Kästchen wurde angekreuzt 
+149	EL625c	3. When leaving for the US, above all Kate felt ...	4	nur das 4. Kästchen wurde angekreuzt: d)	1 1. Kästchen wurde angekreuzt 2 2. Kästchen wurde angekreuzt 3 3. Kästchen wurde angekreuzt 
+150	EL625d	4. Most girls that Kate met at the Boston high school were ...	1	nur das 1. Kästchen wurde angekreuzt: a)	2 2. Kästchen wurde angekreuzt 3 3. Kästchen wurdeangekreuzt 4 4. Kästchen wurdeangekreuzt 
+151	EL625e	5. According to Kate, most lessons at her high school were ...	3	nur das 3. Kästchen wurde angekreuzt: c)	1 1. Kästchen wurde angekreuzt 2 2. Kästchen wurde angekreuzt 4 4. Kästchen wurde angekreuzt 
+152	EL625f	6. Kate thinks that her politics teacher in the US was ...	2	nur das 2. Kästchen wurde angekreuzt: b)	1 1. Kästchen wurde angekreuzt 3 3. Kästchen wurde angekreuzt 4 4. Kästchen wurde angekreuzt 
+153	EL625g	7. Most school kids that Kate met in the US ...	3	nur das 3. Kästchen wurde angekreuzt: c)	1 1. Kästchen wurde angekreuzt 2 2. Kästchen wurde angekreuzt 4 4. Kästchen wurde angekreuzt 
+154	EL626a	1. Before starting at YouthCare, Jennifer ...	2	nur das 2. Kästchen wurde angekreuzt: b)	1 1. Kästchen wurde angekreuzt 3 3. Kästchen wurde angekreuzt 4 4. Kästchen wurde angekreuzt 
+155	EL626b	2. Every time Jennifer passed by the YouthCare building, she felt ...	1	nur das 1. Kästchen wurde angekreuzt: a)	2 2. Kästchen wurde angekreuzt 3 3. Kästchen wurde angekreuzt 4 4. Kästchen wurde angekreuzt 
+156	EL626c	3. When Jennifer entered the building to start cooking for the kids, she felt ...	3	nur das 3. Kästchen wurde angekreuzt: c)	1 1. Kästchen wurde angekreuzt 2 2. Kästchen wurde angekreuzt 4 4. Kästchen wurde angekreuzt 
+157	EL626d	4. Jennifer's firt meeting with the young kids went ...	2	nur das 2. Kästchen wurde angekreuzt: b)	1 1. Kästchen wurde angekreuzt 3 3. Kästchen wurde angekreuzt 4 4. Kästchen wurde angekreuzt 
+158	EL626e	5. For Jennifer, the most important thing is to ...	2	nur das 2. Kästchen wurde angekreuzt: b)	1 1. Kästchen wurde angekreuzt 3 3. Kästchen wurde angekreuzt 4 4. Kästchen wurde angekreuzt 
+159	EL626f	"6. Who does Jennifer call ""guest chefs""?"	3	nur das 3. Kästchen wurde angekreuzt: c)	1 1. Kästchen wurde angekreuzt 2 2. Kästchen wurde angekreuzt 4 4. Kästchen wurde angekreuzt 
+160	EL626g	7. Jennifer's favorite experience was when ...	3	nur das 3. Kästchen wurde angekreuzt: c)	1 1. Kästchen wurde angekreuzt 2 2. Kästchen wurde angekreuzt 4 4. Kästchen wurde angekreuzt 
+161	EL626h	8. To work at YouthCare, interested teenagers ...	4	nur das 4. Kästchen wurde angekreuzt: d)	1 1. Kästchen wurde angekreuzt 2 2. Kästchen wurde angekreuzt 3 3. Kästchen wurde angekreuzt 
+162	EL626i	"9. By ""The Incredibles"", Jennifer means ..."	4	nur das 4. Kästchen wurde angekreuzt: d)	1 1. Kästchen wurde angekreuzt 2 2. Kästchen wurde angekreuzt 3 3. Kästchen wurde angekreuzt 
+163	EL627a	1. Sarah enjoys ...	3	nur das 3. Kästchen wurde angekreuzt: c)	1 1. Kästchen angekreuzt 2 2. Kästchen angekreuzt 4 4. Kästchen angekreuzt 
+164	EL627b	2. For Monica, it is important to ...	1	nur das 1. Kästchen wurde angekreuzt: a)	2 2. Kästchen angekreuzt 3 3. Kästchen angekreuzt 4 4. Kästchen angekreuzt 
+165	EL627c	3. Thomas prefers holiday in which he ...	2	nur das 2. Kästchen wurde angekreuzt: b)	1 Falsch: 1. Kästchen angekreuzt 3 3. Kästchen angekreuzt 4 4. Kästchen angekreuzt 
+166	EL627d	4. Laura loves holidays in which she ...	4	nur das 4. Kästchen wurde angekreuzt: d)	1 1. Kästchen angekreuzt 2 2. Kästchen angekreuzt 3 3. Kästchen angekreuzt 
+167	EL627e	5. For David, the most important thing is to ...	2	nur das 2. Kästchen wurde angekreuzt: b)	1 1. Kästchen angekreuzt 3 3. Kästchen angekreuzt 4 4. Kästchen angekreuzt 
+168	EL628a	1. Tom has not sent you a text message because ...	2	nur das 2. Kästchen wurde angekreuzt: b)	1 1. Kästchen angekreuzt 3 3. Kästchen angekreuzt 4 4. Kästchen angekreuzt 
+169	EL628b	2. You will meet Tom at ...	4	nur das 4. Kästchen wurde angekreuzt: d)	1 1. Kästchen angekreuzt 2 2. Kästchen angekreuzt 3 3. Kästchen angekreuzt 
+170	EL628c	3. Susan informs you that the party will ...	2	nur das 2. Kästchen wurde angekreuzt: b)	1 1. Kästchen angekreuzt 3 3. Kästchen angekreuzt 4 4. Kästchen angekreuzt 
+171	EL628d	4. Susan asks you to see her on ...	3	nur das 3. Kästchen wurde angekreuzt: c)	1 1. Kästchen angekreuzt 2 2. Kästchen angekreuzt 4 4. Kästchen angekreuzt 
+172	EL628e	5. Kate has called because she ...	2	nur das 2. Kästchen wurde angekreuzt: b)	1 1. Kästchen angekreuzt 3 3. Kästchen angekreuzt 4 4. Kästchen angekreuzt 
+173	EL628f	6. Katie asks you to ...	1	nur das 1. Kästchen wurde angekreuzt: a)	2 2. Kästchen angekreuzt 3 3. Kästchen angekreuzt 4 4. Kästchen angekreuzt 
+174	EL629a	1. The advantage of talent shows ...	1	show hidden talents • show talents • fun to see what your classmates do	0 alle anderen Antworten • can be good
+175	EL629b	2. Cynthia has seen many candidates with ...	1	no talent • no real talent • with little talent • with not much talent • without talent	0 alle anderen Antworten
+176	EL629c	3. Cynthia prefers ...	1	small talent shows • small shows • school talent shows • school shows 	0 alle anderen Antworten
+177	EL629d	4. Cynthia finds the big commercialized shows ...	1	not much fun • not very funny • not fun • not enjoyable  • not funny	0 alle anderen Antworten
+178	EL629e	5. Many people's view ...	1	(talent shows only give) five minutes of fame	0 alle anderen Antworten
+179	EL629f	6. Steve disagrees because ... (name one)	1	people (have been able to) show/showed/have shown/(have) prove(d) talent ODER people have had great success (in the long run) ODER (have been) successful	0 alle anderen Antworten
+180	EL629g	7. Advantage for the public (name one)	1	there is more choice • choice • people can choose • people can choose themselves • choose themselves • choose • it is democratic • democratic • more democratic • it is more democratic	0 alle anderen Antworten 
+181	EL631a	1. Yuto ...	3	nur das 3. Kästchen wurde angekreuzt: c)	1 1. Kästchen angekreuzt 2 2. Kästchen angekreuzt 4 4. Kästchen angekreuzt 
+182	EL631b	2. According to Janet, ...	2	nur das 2. Kästchen wurde angekreuzt: b)	1 1. Kästchen angekreuzt 3 3. Kästchen angekreuzt 4 4. Kästchen angekreuzt 
+183	EL631c	3. Tawanda ...	2	nur das 2. Kästchen wurde angekreuzt: b)	1 1. Kästchen angekreuzt 3 3. Kästchen angekreuzt 4 4. Kästchen angekreuzt 
+184	EL631d	4. Badrick ...	1	nur das 1. Kästchen wurde angekreuzt: a)	2 2. Kästchen angekreuzt 3 3. Kästchen angekreuzt 4 4. Kästchen angekreuzt 
+185	EL631e	5. According to Trevor, Britain's political system ...	2	nur das 2. Kästchen wurde angekreuzt: b)	1 1. Kästchen angekreuzt 3 3. Kästchen angekreuzt 4 4. Kästchen angekreuzt 
+186	EL631f	6. According to Lucy, people in her town Hastings ...	4	nur das 4. Kästchen wurde angekreuzt: d)	1 1. Kästchen angekreuzt 2 2. Kästchen angekreuzt 3 3. Kästchen angekreuzt 
+187	EL641a	1. Claire	05	E/e	01 A/a 02 B/b 03 C/c 04 D/d 06 F/f 07 G/g
+188	EL641b	2. Trevor	01	A/a	02 B/b 03 C/c 04 D/d 05 E/e 06 F/f 07 G/g
+189	EL641c	3. Jane	03	C/c	01 A/a 02 B/b 04 D/d 05 E/e 06 F/f 07 G/g
+190	EL641d	4. Brad	02	B/b	01 A/a 03 C/c 04 D/d 05 E/e 06 F/f 07 G/g 
+191	EL642a	Fiona (1)	02	B/b	01 A/a 03 C/c 04 D/d 05 E/e 06 F/f 07 G/g
+192	EL642b	Paul (2)	04	D/d	01 A/a 02 B/b 03 C/c 05 E/e 06 F/f 07 G/g
+193	EL642c	Rachel (3)	01	A/a	02 B/b 03 C/c 04 D/d 05 E/e 06 F/f 07 G/g
+194	EL642d	Danny (4)	05	E/e	01 A/a 02 B/b 03 C/c 04 D/d 06 F/f 07 G/g 
+195	ELi001a		1	nur das 1. Kästchen wurde angekreuzt	2 2. Kästchen angekreuzt 3 3. Kästchen angekreuzt 
+196	ELi001b		3	nur das 3. Kästchen wurde angekreuzt	1 1. Kästchen angekreuzt 2 2. Kästchen angekreuzt 
+197	ELi001c		1	nur das 1. Kästchen wurde angekreuzt	2 2. Kästchen angekreuzt 3 3. Kästchen angekreuzt 
+198	ELi002a	1. Ron is phoning because…	2	nur das 2. Kästchen wurde angekreuzt: b)	1 1. Kästchen angekreuzt 3 3. Kästchen angekreuzt 
+199	ELi002b	2. Tick the correct telephone number	3	nur das 3. Kästchen wurde angekreuzt: c)	1 1. Kästchen angekreuzt 2 2. Kästchen angekreuzt 
+200	ELi003a	1. Lisa carried her mobile, ...	1	nur das 1. Kästchen wurde angekreuzt: a)	2 2. Kästchen angekreuzt 3 3. Kästchen angekreuzt 
+201	ELi003b	2. Lisa has broken her mobile when...	2	nur das 2. Kästchen wurde angekreuzt: b)	1 1. Kästchen angekreuzt 3 3. Kästchen angekreuzt 
+202	ELi003c	3. Now she can...	3	nur das 3. Kästchen wurde angekreuzt: c)	1 1. Kästchen angekreuzt 2 2. Kästchen angekreuzt 
+203	ELi004a	1. Ron wants to work in the book store ...	2	nur das 2. Kästchen wurde angekreuzt: b)	1 1. Kästchen angekreuzt 3 3. Kästchen angekreuzt 
+204	ELi004b	2. His number is ...	2	nur das 2. Kästchen wurde angekreuzt: b)	1 1. Kästchen angekreuzt 3 3. Kästchen angekreuzt 
+205	ELi005a	1. The man is Kisty's old ...	1	nur das 1. Kästchen wurde angekreuzt: a)	2 2. Kästchen angekreuzt 3 3. Kästchen angekreuzt 
+206	ELi005b	2. He has a new flat ...	3	nur das 3. Kästchen wurde angekreuzt: c)	1 1. Kästchen angekreuzt 2 2. Kästchen angekreuzt 
+207	ELi005c	3. His flat has got a modern kitchen and ...	2	nur das 2. Kästchen wurde angekreuzt: b)	1 1. Kästchen angekreuzt 3 3. Kästchen angekreuzt 
+208	ELi005d	4. The man invites Kirsty...	3	nur das 3. Kästchen wurde angekreuzt: c)	1 1. Kästchen angekreuzt 2 2. Kästchen angekreuzt 
+209	ELi006a	1. She weants to know how he started s...	1	kateboarding • skateboarding	0 alle anderen Antworten
+210	ELi006b	2. It started when his s... Carol took him with her.	1	ister • sister	0 alle anderen Antworten
+211	ELi006c	3. He was only t... years old then.	1	hree • three	0 alle anderen Antworten
+212	ELi006d	4. First it was only a g... , but he learned quickly.	1	ame • game	0 alle anderen Antworten
+213	ELi006e	5. Today he is the most famous skater in A... .	1	ustralia • Australia	0 alle anderen Antworten
+214	ELi006f	6. He works as a stunt man in f... .	1	ilms • films	0 alle anderen Antworten 
+215	ELi007a	1. What does she want to drink?	1	milk shake • shake • strawberry milk shake • strawberry milk • strawberry milk shake • strawberry shake	0 alle anderen Antworten • milk
+216	ELi007b	2. What size does she take?	1	large	0 alle anderen Antworten
+217	ELi007c	3. What does she want for the dog?	1	water	0 alle anderen Antworten
+218	ELi007d	4. What is the name of the girl's dog?	1	Gina	0 alle anderen Antworten
+219	ELi007e	5. How much does she pay?	1	5	0 alle anderen Antworten 
+220	ELi008a	1. Jenny has got an invitation to ...	04	D/d	01 A/a 02 B/b 03 C/c 05 E/e 06 F/f
+221	ELi008b	2. Jenny will ...	01	A/a	02 B/b 03 C/c 04 D/d 05 E/e 06 F/f
+222	ELi008c	3. The meeting in her office is ...	06	F/f	01 A/a 02 B/b 03 C/c 04 D/d 05 E/e
+223	ELi008d	4. Jenny will see Bill ...	02	B/b	01 A/a 03 C/c 04 D/d 05 E/e 06 F/f 
+224	ELi009a	1. What does he need to borrow books?	1	a card • a library card • card • library card	0 alle anderen Antworten
+225	ELi009b	2. What class is he in?	1	in class 8B • in class 8 • in 8B • class 8B • 8B • 8 • class 8 • in 8	0 alle anderen Antworten
+226	ELi009c	3. How old is Daniel?	1	15 years • 15	0 alle anderen Antworten
+227	ELi009d	4. What does he need to finish the document?	1	a photo • photo	0 alle anderen Antworten
+228	ELi009e	5. For how long can he borrow the books?	1	week • a week • next week	0 alle anderen Antworten 
+229	ELi010a	The lady is angry because some children ...	2	nur das 2. Kästchen wurde angekreuzt: b)	1 1. Kästchen angekreuzt 3 3. Kästchen angekreuzt 4 4. Kästchen angekreuzt 
+230	ELi011a	1. Sarah’s family name is …	1	nur das 1. Kästchen wurde angekreuzt: a)	2 2. Kästchen angekreuzt 3 3. Kästchen angekreuzt 
+231	ELi011b	2. You can hear the show …	2	nur das 2. Kästchen wurde angekreuzt: b)	1 1. Kästchen angekreuzt 3 3. Kästchen angekreuzt 
+232	ELi011c	3. The name of the show is …	3	nur das 3. Kästchen wurde angekreuzt: c)	1 1. Kästchen angekreuzt 2 2. Kästchen angekreuzt 
+233	ELi011d	4. The person calling is …	1	nur das 1. Kästchen angekreuzt: a)	2 2. Kästchen angekreuzt 3 3. Kästchen angekreuzt 
+234	ELi011e	5. Julia is …	3	nur das 3. Kästchen wurde angekreuzt: c)	1 1. Kästchen angekreuzt 2 2. Kästchen angekreuzt 
+235	ELi011f	6. She has broken …	2	nur das 2. Kästchen wurde angekreuzt: b)	1 1. Kästchen angekreuzt 3 3. Kästchen angekreuzt 
+236	ELi011g	7. They miss Julia …	2	nur das 2. Kästchen wurde angekreuzt: b)	1 1. Kästchen angekreuzt 3 3. Kästchen angekreuzt 
+237	ELi012a	1. Anna wants to buy ...	1	nur das 1. Kästchen wurde angekreuzt: a)	2 2. Kästchen angekreuzt 3 3. Kästchen angekreuzt 
+238	ELi012b	2. Now it's ...	3	nur das 3. Kästchen wurde angekreuzt: c)	1 1. Kästchen angekreuzt 2 2. Kästchen angekreuzt 
+239	ELi012c	3. Steve wants to buy a new smartphone because …	2	nur das 2. Kästchen wurde angekreuzt: b)	1 1. Kästchen angekreuzt 3 3. Kästchen angekreuzt 
+240	ELi012d	4. Steve and Anna are ...	2	nur das 2. Kästchen wurde angekreuzt: b)	1 1. Kästchen angekreuzt 3 3. Kästchen angekreuzt 
+241	ELi013a	1. You are listening to ...	2	nur das 2. Kästchen wurde angekreuzt: b)	1 1. Kästchen angekreuzt 3 3. Kästchen angekreuzt 
+242	ELi013b	2. Tomorrow, it will be ...	3	nur das 3. Kästchen wurde angekreuzt: c)	1 1. Kästchen angekreuzt 2 2. Kästchen angekreuzt 
+243	ELi014a	1. The boy's name is ...	1	Max  • His name is Max	0 alle anderen Antworten
+244	ELi014b	2. The girl wants to go to a concert of ... (singer)	1	Robbie Williams  • Robie Willems	0 alle anderen Antworten
+245	ELi014c	3. The concert starts at ... (time)	1	8	0 alle anderen Antworten
+246	ELi014d	4. They meet at ... (place)	1	bus	0 alle anderen Antworten 
+247	ELi015a	1. The date is in ... minutes	1	10 minutes • 10 	0 alle anderen Antworten
+248	ELi015b	2. The man has to go straight and then turn ...	1	right	0 alle anderen Antworten
+249	ELi015c	3. The cinema is next to ...	1	big shopping center • shopping center • shopping mall	0 alle anderen Antworten 
+250	ELi016a	1. What day is today?	1	nur das 1. Kästchen wurde angekreuzt: a)	2 2. Kästchen angekreuzt 3 3. Kästchen angekreuzt 
+251	ELi016b	2. Where is the Radio Show?	2	nur das 2. Kästchen wurde angekreuzt: b)	1 1. Kästchen angekreuzt 3 3. Kästchen angekreuzt 
+252	ELi016c	3. When children knock on the doors, they shout …	2	nur das 2. Kästchen wurde angekreuzt: b)	1 1. Kästchen angekreuzt 3 3. Kästchen angekreuzt 
+253	ELi016d	4. How do the children look like?	3	nur das 3. Kästchen wurde angekreuzt: c)	1 1. Kästchen angekreuzt 2 2. Kästchen angekreuzt 
+254	ELi016e	5. Lucy is listening to the radio show. She wants to win. What is she doing now?	1	nur das 1. Kästchen wurde angekreuzt: a)	2 2. Kästchen angekreuzt 3 3. Kästchen angekreuzt 
+255	ELi017a	1. What are you listening to?	2	nur das 2. Kästchen wurde angekreuzt	1 1. Kästchen angekreuzt 3 3. Kästchen angekreuzt 
+256	ELi017b	2. Who is talking?	1	nur das 1. Kästchen wurde angekreuzt	2 2. Kästchen angekreuzt 3 3. Kästchen angekreuzt 
+257	ELi017c	3. What costumes do the people wear?	3	nur das 3. Kästchen wurde angekreuzt	1 1. Kästchen angekreuzt 2 2. Kästchen angekreuzt 
+258	ELi017d	4. What does the family look like?	1	nur das 1. Kästchen wurde angekreuzt	2 2. Kästchen angekreuzt 3 3. Kästchen angekreuzt 
+259	ELi018a	Who eats and drinks what? Megan	1	b	0 alle anderen Antworten
+260	ELi018b	Who eats and drinks what? Megan's brother	1	a	0 alle anderen Antworten
+261	ELi018c	Who eats and drinks what? Megan's mother	1	d	0 alle anderen Antworten 
+262	ELi019a	1. Anne	4	nur das 4. Kästchen wurde angekreuzt: diary	1 1. Kästchen angekreuzt: video game 2 2. Kästchen angekreuzt: cake 3 3. Kästchen angekreuzt: cosmetics
+263	ELi019b	2. Jake	2	nur das 2. Kästchen wurde angekreuzt: cake	1 1. Kästchen angekreuzt: video game 3 3. Kästchen angekreuzt: cosmetics 4 4. Kästchen angekreuzt: diary 
+264	ELi020a	Jill is in the gym of …	02	B/b	01 A/a 03 C/c 04 D/d 05 E/e 06 F/f 07 G/g
+265	ELi020b	Her friend´s name is …	06	F/f	01 A/a 02 B/b 03 C/c 04 D/d 05 E/e 07 G/g
+266	ELi020c	Paul has broken …	03	C/c	01 A/a 02 B/b 04 D/d 05 E/e 06 F/f 07 G/g
+267	ELi020d	The ambulance will be at the school in …	07	G/g	01 A/a 02 B/b 03 C/c 04 D/d 05 E/e 06 F/f
+268	ELi020e	The school address is …	04	D/d	01 A/a 02 B/b 03 C/c 05 E/e 06 F/f 07 G/g 
+269	ELi021a	1. mum	3	C/c	1 A/a 2 B/b 4 D/d 5 E/e
+270	ELi021b	2. Suzy	2	B/b	1 A/a 3 C/c 4 D/d 5 E/e
+271	ELi021c	3. brother	4	D/d	1 A/a 2 B/b 3 C/c 5 E/e 
+272	ER005a		02	b/B	01 a/A 03 c/C 04 d/D 05 e/E 06 f/F 07 g/G
+273	ER005b		04	d/D	01 a/A 02 b/B 03 c/C 05 e/E 06 f/F 07 g/G
+274	ER005c		01	a/A	02 b/B 03 c/C 04 d/D 05 e/E 06 f/F 07 g/G
+275	ER005d		07	g/G	01 a/A 02 b/B 03 c/C 04 d/D 05 e/E 06 f/F
+276	ER005e		03	c/C	01 a/A 02 b/B 04 d/D 05 e/E 06 f/F 07 g/G 
+277	ER013a	1. Anne is happy, because she can meet her friends.	2	false	1 true 3 not given
+278	ER013b	2. Anne's mother thinks she is not very intelligent.	3	not given	1 true 2 false
+279	ER013c	3. Anne shouldn't tell her mother that she needs help.	2	false	1 true 3 not given
+280	ER013d	4. Anne should get her Mum to believe in her.	1	true	2 false 3 not given
+281	ER013e	5. Anne's mother may let her go out if her school work gets better.	1	true	2 false 3 not given
+282	ER013f	6. Anne should ask her friends for help.	3	not given	1 true 2 false 
+283	ER015a		03	c/C	01 a/A 02 b/B 04 d/D 05 e/E 06 f/F 07 g/G 08 h/H 09 i/I 10 j/J
+284	ER015b		07	g/G	01 a/A 02 b/B 03 c/C 04 d/D 05 e/E 06 f/F 08 h/H 09 i/I 10 j/J
+285	ER015c		01	a/A	02 b/B 03 c/C 04 d/D 05 e/E 06 f/F 07 g/G 08 h/H 09 i/I 10 j/J
+286	ER015d		08	h/H	01 a/A 02 b/B 03 c/C 04 d/D 05 e/E 06 f/F 07 g/G 09 i/I 10 j/J
+287	ER015e		04	d/D	01 a/A 02 b/B 03 c/C 05 e/E 06 f/F 07 g/G 08 h/H 09 i/I 10 j/J
+288	ER015f		10	j/J	01 a/A 02 b/B 03 c/C 04 d/D 05 e/E 06 f/F 07 g/G 08 h/H 09 i/I
+289	ER015g		09	i/I	01 a/A 02 b/B 03 c/C 04 d/D 05 e/E 06 f/F 07 g/G 08 h/H 10 j/J 
+290	ER016a	1. How long is the shop open every day?	1	24 hours  • the hole day • all day • day and night	0 alle anderen Antworten
+291	ER016b	2. What is the shop called?	1	2000 • Shop 2000 • vending machine	0 alle anderen Antworten
+292	ER016c	3. In what two ways can you pay?	1	coins and card  • coins and card • coin and credit card • cash + visa • cash / credit-card • money and card • to coin / card • creditcard + money	0 alle anderen Antworten • coincard • coin- and credit-card-operated
+293	ER016d	4. How many different things does the shop sell?	1	up to 200 items • up to 200 • 200 • 200 items	0 alle anderen Antworten 
+294	ER021a		09	i/I	01 a/A 02 b/B 03 c/C 04 d/D 05 e/E 06 f/F 07 g/G 08 h/H 10 j/J 11 k/K
+295	ER021b		05	e/E	01 a/A 02 b/B 03 c/C 04 d/D 06 f/F 07 g/G 08 h/H 09 i/I 10 j/J 11 k/K
+296	ER021c		10	j/J	01 a/A 02 b/B 03 c/C 04 d/D 05 e/E 06 f/F 07 g/G 08 h/H 09 i/I 11 k/K
+297	ER021d		06	f/F	01 a/A 02 b/B 03 c/C 04 d/D 05 e/E 07 g/G 08 h/H 09 i/I 10 j/J 11 k/K
+298	ER021e		03	c/C	01 a/A 02 b/B 04 d/D 05 e/E 06 f/F 07 g/G 08 h/H 09 i/I 10 j/J 11 k/K
+299	ER021f		11	k/K	01 a/A 02 b/B 03 c/C 04 d/D 05 e/E 06 f/F 07 g/G 08 h/H 09 i/I 10 j/J
+300	ER021g		02	b/B	01 a/A 03 c/C 04 d/D 05 e/E 06 f/F 07 g/G 08 h/H 09 i/I 10 j/J 11 k/K
+301	ER021h		01	a/A	02 b/B 03 c/C 04 d/D 05 e/E 06 f/F 07 g/G 08 h/H 09 i/I 10 j/J 11 k/K
+302	ER021i		04	d/D	01 a/A 02 b/B 03 c/C 05 e/E 06 f/F 07 g/G 08 h/H 09 i/I 10 j/J 11 k/K 
+303	ER024a	1. In which street is the house in the advert?	1	Sandy Lane  • sandy lane	0 alle anderen Antworten
+304	ER024b	2. How old is the house?	1	10 years  • ten years old • 10 year	0 alle anderen Antworten • 10
+305	ER024c	3. Which town is one mile away?	1	Waldon  • waldon	0 alle anderen Antworten
+306	ER024d	4. What size is the sunny garden behind the house?	1	large  • big • huge	0 alle anderen Antworten
+307	ER024e	5. How many cars can you put in the garage?	1	2	0 alle anderen Antworten
+308	ER024f	6. Where is the bathroom with the shower?	1	 it is downstairs • downstairs  • downstair	0 alle anderen Antworten  • basement 
+309	ER045a	1. Where can you see animals every day?	01	a/A	02 b/B 03 c/C
+310	ER045b	2. Which theme park offers places to eat?	02	b/B	01 a/A 03 c/C
+311	ER045c	3. Which theme park has most activities?	02	b/B	01 a/A 03 c/C
+312	ER045d	4. Which theme park is closed on Sundays?	03	c/C	01 a/A 02 b/B
+313	ER045e	5. Which place is not very well known yet?	01	a/A	02 b/B 03 c/C
+314	ER045f	6. Which park is in large area of lovely countryside?	03	c/C	01 a/A 02 b/B 
+315	ER052a	1. Lots of animals lived here up to 1934.	06	f/F	01 a/A 02 b/B 03 c/C 04 d/D 05 e/E 07 g/G
+316	ER052b	2. The big house near the lake was finished in 1872.	07	g/G	01 a/A 02 b/B 03 c/C 04 d/D 05 e/E 06 f/F
+317	ER052c	3. This area was a lake until 1937, now there is grass.	05	e/E	01 a/A 02 b/B 03 c/C 04 d/D 06 f/F 07 g/G
+318	ER052d	4. A wooden roundabout has been here since 1873.	03	c/C	01 a/A 02 b/B 04 d/D 05 e/E 06 f/F 07 g/G
+319	ER052e	5. The place became the official symbol of the nation in 1965.	01	a/A	02 b/B 03 c/C 04 d/D 05 e/E 06 f/F 07 g/G 
+320	ER057a	The text is...	2	nur das 2. Kästchen wurde angekreuzt: b)	1 1. Kästchen wurde angekreuzt 3 3. Kästchen wurde angekreuzt 4 4. Kästchen wurde angekreuzt 
+321	ER065a	1. When she looks at the street where Margaret lives, Sal is...	2	nur das 2. Kästchen wurde angekreuzt: b)	1 1. Kästchen wurde angekreuzt 3 3. Kästchen wurde angekreuzt 4 4. Kästchen wurde angekreuzt 
+322	ER065b	2. Sal's attitude towards Margaret is...	1	nur das 1. Kästchen wurde angekreuzt: a)	2 2. Kästchen wurde angekreuzt 3 3. Kästchen wurde angekreuzt 4 4. Kästchen wurde angekreuzt 
+323	ER065c	3. Sal's father's behavior towards Margaret is...	3	nur das 3. Kästchen wurde angekreuzt: c)	1 1. Kästchen wurde angekreuzt 2 2. Kästchen wurde angekreuzt 4 4. Kästchen wurde angekreuzt 
+324	ER065d	4. Sal's father thinks his daughter should...	4	nur das 4. Kästchen wurde angekreuzt: d)	1 1. Kästchen wurde angekreuzt 2 2. Kästchen wurde angekreuzt 3 3. Kästchen wurde angekreuzt 
+325	ER072a		08	h/H	01 a/A 02 b/B 03 c/C 04 d/D 05 e/E 06 f/F 07 g/G 09 i/I 10 j/J
+326	ER072b		02	b/B	01 a/A 03 c/C 04 d/D 05 e/E 06 f/F 07 g/G 08 h/H 09 i/I 10 j/J
+327	ER072c		07	g/G	01 a/A 02 b/B 03 c/C 04 d/D 05 e/E 06 f/F 08 h/H 09 i/I 10 j/J
+328	ER072d		09	i/I	01 a/A 02 b/B 03 c/C 04 d/D 05 e/E 06 f/F 07 g/G 08 h/H 10 j/J
+329	ER072f		01	a/A	02 b/B 03 c/C 04 d/D 05 e/E 06 f/F 07 g/G 08 h/H 09 i/I 10 j/J
+330	ER072g		03	c/C	01 a/A 02 b/B 04 d/D 05 e/E 06 f/F 07 g/G 08 h/H 09 i/I 10 j/J
+331	ER072h		06	f/F	01 a/A 02 b/B 03 c/C 04 d/D 05 e/E 07 g/G 08 h/H 09 i/I 10 j/J 
+332	ER080a		08	h/H	01 a/A 02 b/B 03 c/C 04 d/D 05 e/E 06 f/F 07 g/G 09 i/I 10 j/J 11 k/K 12 l/L
+333	ER080b		04	d/D	01 a/A 02 b/B 03 c/C 05 e/E 06 f/F 07 g/G 08 h/H 09 i/I 10 j/J 11 k/K 12 l/L
+334	ER080c		03	c/C	01 a/A 02 b/B 04 d/D 05 e/E 06 f/F 07 g/G 08 h/H 09 i/I 10 j/J 11 k/K 12 l/L
+335	ER080d		06	f/F	01 a/A 02 b/B 03 c/C 04 d/D 05 e/E 07 g/G 08 h/H 09 i/I 10 j/J 11 k/K 12 l/L
+336	ER080e		01	a/A	02 b/B 03 c/C 04 d/D 05 e/E 06 f/F 07 g/G 08 h/H 09 i/I 10 j/J 11 k/K 12 l/L
+337	ER080f		12	l/L	01 a/A 02 b/B 03 c/C 04 d/D 05 e/E 06 f/F 07 g/G 08 h/H 09 i/I 10 j/J 11 k/K
+338	ER080g		07	g/G	01 a/A 02 b/B 03 c/C 04 d/D 05 e/E 06 f/F 08 h/H 09 i/I 10 j/J 11 k/K 12 l/L
+339	ER080h		10	j/J	01 a/A 02 b/B 03 c/C 04 d/D 05 e/E 06 f/F 07 g/G 08 h/H 09 i/I 11 k/K 12 l/L
+340	ER080i		11	k/K	01 a/A 02 b/B 03 c/C 04 d/D 05 e/E 06 f/F 07 g/G 08 h/H 09 i/I 10 j/J 12 l/L
+341	ER080j		02	b/B	01 a/A 03 c/C 04 d/D 05 e/E 06 f/F 07 g/G 08 h/H 09 i/I 10 j/J 11 k/K 12 l/L 
+342	ER084a	The text is about...	3	nur das 3. Kästchen wurde angekreuzt: c)	1 1. Kästchen wurde angekreuzt 2 2. Kästchen wurde angekreuzt 4 4. Kästchen wurde angekreuzt 
+343	ER093a	1. What is the problem described in this article?	2	nur das 2. Kästchen wurde angekreuzt: b)	1 1. Kästchen wurde angekreuzt 3 3. Kästchen wurde angekreuzt 4 4. Kästchen wurde angekreuzt 
+344	ER093b	2. Which of the following statements is mentioned in the article?	1	nur das 1. Kästchen wurde angekreuzt: a)	2 2. Kästchen wurde angekreuzt 3 3. Kästchen wurde angekreuzt 4 4. Kästchen wurde angekreuzt 
+345	ER093c	3. Which areas are you not allowed in if you're under 18?	2	nur das 2. Kästchen wurde angekreuzt: b)	1 1. Kästchen wurde angekreuzt 3 3. Kästchen wurde angekreuzt 4 4. Kästchen wurde angekreuzt 
+346	ER093d	4. What solution is outlined in the article?	4	nur das 4. Kästchen wurde angekreuzt: d)	1 1. Kästchen wurde angekreuzt 2 2. Kästchen wurde angekreuzt 3 3. Kästchen wurde angekreuzt 
+347	ER101a	The text is about how to...	4	nur das 4. Kästchen wurde angekreuzt: d)	1 1. Kästchen wurde angekreuzt 2 2. Kästchen wurde angekreuzt 3 3. Kästchen wurde angekreuzt 
+348	ER104a		07	g/G	01 a/A 02 b/B 03 c/C 04 d/D 05 e/E 06 f/F
+349	ER104b		01	a/A	02 b/B 03 c/C 04 d/D 05 e/E 06 f/F 07 g/G
+350	ER104c		05	e/E	01 a/A 02 b/B 03 c/C 04 d/D 06 f/F 07 g/G
+351	ER104d		03	c/C	01 a/A 02 b/B 04 d/D 05 e/E 06 f/F 07 g/G 
+352	ER107a	1. Name Dublin's cultural quarter.	1	Temple Bar	0 alle anderen Antworten
+353	ER107b	2. Where can you go shopping in Dublin?	1	Grafton Street	0 alle anderen Antworten
+354	ER107c	3. When was St. Stephen's Green built?	1	19th century	0 alle anderen Antworten
+355	ER107d	4. How big is Dublin Zoo?	1	30 acres • thirty acres	0 alle anderen Antworten
+356	ER107e	5. What's special about the pubs?	1	Music • Music several nights a week	0 alle anderen Antworten
+357	ER107f	6. Where is the book of Kells?	1	Trinity College	0 alle anderen Antworten
+358	ER107ga	7. Name 3 kinds of transport in Dublin? a)	1	bus taxi train Luas Dart	0 alle anderen Antworten
+359	ER107gb	7. Name 3 kinds of transport in Dublin? b)	1	bus taxi train Luas Dart	0 alle anderen Antworten
+360	ER107gc	7. Name 3 kinds of transport in Dublin? c)	1	bus taxi train Luas Dart	0 alle anderen Antworten 
+361	ER119a	1. When was the crown made?	1	1937	0 alle anderen Antworten
+362	ER119b	2. What is the name of its biggest diamond?	1	Koh-i-Norr	0 alle anderen Antworten
+363	ER119c	3. What is special about it?	1	brings bad luck • is only worn by women  • brings bad luck to men • only women wear it • only a woman can wear it	0 alle anderen Antworten
+364	ER119d	4. Why did Queen Victoria not like to wear a heaby crown?	1	she gets a headache • headache	0 alle anderen Antworten
+365	ER119e	5. How many diamonds does Queen Victoria's crown have?	1	1,300  • one thousand and three hundred	0 alle anderen Antworten 
+366	ER123a		06	f/F	01 a/A 02 b/B 03 c/C 04 d/D 05 e/E 07 g/G 08 h/H 09 i/I 10 j/J 11 k/K
+367	ER123b		01	a/A	02 b/B 03 c/C 04 d/D 05 e/E 06 f/F 07 g/G 08 h/H 09 i/I 10 j/J 11 k/K
+368	ER123c		08	h/H	01 a/A 02 b/B 03 c/C 04 d/D 05 e/E 06 f/F 07 g/G 09 i/I 10 j/J 11 k/K
+369	ER123d		09	i/I	01 a/A 02 b/B 03 c/C 04 d/D 05 e/E 06 f/F 07 g/G 08 h/H 10 j/J 11 k/K
+370	ER123e		11	k/K	01 a/A 02 b/B 03 c/C 04 d/D 05 e/E 06 f/F 07 g/G 08 h/H 09 i/I 10 j/J
+371	ER123f		03	c/C	01 a/A 02 b/B 04 d/D 05 e/E 06 f/F 07 g/G 08 h/H 09 i/I 10 j/J 11 k/K
+372	ER123g		02	b/B	01 a/A 03 c/C 04 d/D 05 e/E 06 f/F 07 g/G 08 h/H 09 i/I 10 j/J 11 k/K
+373	ER123h		10	j/J	01 a/A 02 b/B 03 c/C 04 d/D 05 e/E 06 f/F 07 g/G 08 h/H 09 i/I 11 k/K 
+374	ER125a	1. How old is the Japanese winner?	1	16  • 16 year old	0 alle anderen Antworten
+375	ER125b	2. Where did the championship take place?	1	Hungary • Hungary´s capital • Budapest	0 alle anderen Antworten
+376	ER125c	3. Who invented the cube in 1974?	1	Erno Rubik • Rubik	0 alle anderen Antworten • architect
+377	ER125d	4. How many cubes have been bought?	1	More than 300 million	0 alle anderen Antworten • 300 Mill. 
+378	ER126a	1. How much is the fine if a family has 3 or 4 children?	1	they pay US $12,500 • US $12,500 	0 alle anderen
+379	ER126b	2. How old are the children normally when they start kindergarten?	1	4 or 5 years	0 alle anderen • 4 years • 5 years
+380	ER126c	3. What is kindergarten called for very young kids (2 or 3 years old)?	1	day-care centre	0 alle anderen
+381	ER126d	4. How long did Dao go into kindergarten?	1	half a year • six months	0 alle anderen
+382	ER126e	5. What did Dao start at the age of seven?	1	primary school	0 alle anderen 
+383	ER303a		02	b/B	01 a/A 03 c/C 04 d/D 05 e/E 06 f/F
+384	ER303b		05	e/E	01 a/A 02 b/B 03 c/C 04 d/D 06 f/F
+385	ER303c		04	d/D	01 a/A 02 b/B 03 c/C 05 e/E 06 f/F
+386	ER303d		06	f/F	01 a/A 02 b/B 03 c/C 04 d/D 05 e/E 
+387	ER318a		07	g/G	01 a/A 02 b/B 03 c/C 04 d/D 05 e/E 06 f/F 08 h/H
+388	ER318b		08	h/H	01 a/A 02 b/B 03 c/C 04 d/D 05 e/E 06 f/F 07 g/G
+389	ER318c		01	a/A	02 b/B 03 c/C 04 d/D 05 e/E 06 f/F 07 g/G 08 h/H
+390	ER318d		04	d/D	01 a/A 02 b/B 03 c/C 05 e/E 06 f/F 07 g/G 08 h/H
+391	ER318e		03	c/C	01 a/A 02 b/B 04 d/D 05 e/E 06 f/F 07 g/G 08 h/H 
+392	ER332a	1. How long was the first track?	2	nur das 2. Kästchen wurde angekreuzt: b)	1 1. Kästchen wurde angekreuzt 3 3. Kästchen wurde angekreuzt 4 4. Kästchen wurde angekreuzt 
+393	ER332b	2. What was opened in 1913?	3	nur das 3. Kästchen wurde angekreuzt: c)	1 1. Kästchen wurde angekreuzt 2 2. Kästchen wurde angekreuzt 4 4. Kästchen wurde angekreuzt 
+394	ER332c	3. How many passenger cars were there?	4	nur das 4. Kästchen wurde angekreuzt: d)	1 1. Kästchen wurde angekreuzt 2 2. Kästchen wurde angekreuzt 3 3. Kästchen wurde angekreuzt 
+395	ER332d	4. Which special kind of car existed?	1	nur das 1. Kästchen wurde angekreuzt: a)	2 2. Kästchen wurde angekreuzt 3 3. Kästchen wurde angekreuzt 4 4. Kästchen wurde angekreuzt 
+396	ER332e	5. When did the last streetcar cross the bridge?	4	nur das 4. Kästchen wurde angekreuzt: d)	1 1. Kästchen wurde angekreuzt 2 2. Kästchen wurde angekreuzt 3 3. Kästchen wurde angekreuzt 
+397	ER336a	1. Location	1	Llanwrtyd Wells • small Welsh town • Welsh town	0 alle anderen Antworten
+398	ER336b	2. Date of this year's marathon	1	12 June	0 alle anderen Antworten
+399	ER336c	3. Founder	1	Gordon Green • Green • local landlord	0 alle anderen Antworten
+400	ER336d	4. Average number of runners	1	500	0 alle anderen Antworten
+401	ER336e	5. Average number of horses	1	50	0 alle anderen Antworten
+402	ER336f	6. Length of race	1	22 miles • slightly shorter than normal marathon • shorter than marathon • shorter than normal marathon • slightly shorter than marathon	0 alle anderen Antworten
+403	ER336g	7. Type of ground (Name one)	1	rough terrain  • marsh • mountain • bog • steep hill • hill	0 alle anderen Antworten
+404	ER336h	8. Number of years it took a man to win	1	25 • 25 years	0 alle anderen Antworten
+405	ER336i	9. Another unusual event besides the marathon	1	Bog Snorkelling Championships	0 alle anderen Antworten
+406	ER336j	10. Registration price per runner	1	£18	0 alle anderen Antworten 
+407	ER577a	1. With her petition, Eva fights for her son to get no homework.	1	true Das 1. Kästchen wurde angekreuzt.	2 2. Kästchen angekreuzt 3 3. Kästchen angekreuzt
+408	ER577b	2. To do his homework Eva's son Emilio takes more than two hours a day.	1	true Das 1. Kästchen wurde angekreuzt.	2 2. Kästchen angekreuzt 3 3. Kästchen angekreuzt
+409	ER577c	3. Emilio is good at most school subjects.	3	not in the text Das 3. Kästchen wurde angekreuzt.	1 1. Kästchen angekreuzt 2 2. Kästchen angekreuzt
+410	ER577d	4. Eva's other children need less time than Emilio for their homework.	1	true Das 1. Kästchen wurde angekreuzt.	2 2. Kästchen angekreuzt 3 3. Kästchen angekreuzt
+411	ER577e	5. Alfonso Gonzales is divorced.	3	not in the text Das 3. Kästchen wurde angekreuzt.	1 1. Kästchen angekreuzt 2 2. Kästchen angekreuzt
+412	ER577f	6. Alfonso supports Eva's petition.	1	true Das 1. Kästchen wurde angekreuzt.	2 2. Kästchen angekreuzt 3 3. Kästchen angekreuzt
+413	ER577g	7. Alfonso thinks that children should get no homework.	2	false Das 2. Kästchen wurde angekreuzt.	1 1. Kästchen angekreuzt 3 3. Kästchen angekreuzt
+414	ER577h	8. Alfonso's daughter is too young to go to school.	2	false Das 2. Kästchen wurde angekreuzt.	1 1. Kästchen angekreuzt 3 3. Kästchen angekreuzt
+415	ER577i	9. To do their homework, most teenagers in Spain take less time than Emilio.	2	false Das 2. Kästchen wurde angekreuzt.	1 1. Kästchen angekreuzt 3 3. Kästchen angekreuzt
+416	ER577j	10. Emilio's teachers are annoyed about Eva's petition.	3	not in the text Das 3. Kästchen wurde angekreuzt.	1 1. Kästchen angekreuzt 2 2. Kästchen angekreuzt 
+417	ER578a	"1. ""There are teens (and adults, too) who don't care about the president, the government or our laws. Those of us who do care are better off waiting to reach age 18, so that we can be more infromed about what and who we're voting for. Teens often claim that we know a lot, and while this may be true, we need time to mature."" - Frank, 15"	07	G/g	01 A/a 02 B/b 03 C/c 04 D/d 05 E/e 06 F/f 08 H/h
+418	ER578b		02	B/b	01 A/a 03 C/c 04 D/d 05 E/e 06 F/f 07 G/g 08 H/h
+419	ER578c		03	C/c	01 A/a 02 B/b 04 D/d 05 E/e 06 F/f 07 G/g 08 H/h
+420	ER578d		05	E/e	01 A/a 02 B/b 03 C/c 04 D/d 06 F/f 07 G/g 08 H/h
+421	ER578e		01	A/a	02 B/b 03 C/c 04 D/d 05 E/e 06 F/f 07 G/g 08 H/h 
+422	ERe001a		4	nur das 4. Kästchen wurde angekreuzt: d)	1 1. Kästchen angekreuzt 2 2. Kästchen angekreuzt 3 3. Kästchen angekreuzt 
+423	ERe002a	1. What is bullying?	3	nur das 3. Kästchen wurde angekreuzt: c)	1 1. Kästchen angekreuzt 2 2. Kästchen angekreuzt 4 4. Kästchen angekreuzt 
+424	ERe002b	2. Cyberbullying ...	2	nur das 2. Kästchen wurde angekreuzt: b)	1 1. Kästchen angekreuzt 3 3. Kästchen angekreuzt 4 4. Kästchen angekreuzt 
+425	ERe003a	1. Troy's age	1	14 • 14 years old	0 alle anderen Antworten
+426	ERe003b	2. Name of the computer game	1	Fight the rabbit	0 alle anderen Antworten
+427	ERe003c	3. Names of Troy's rabbits	1	Blacky and Whitey	0 alle anderen Antworten
+428	ERe003d	4. Troy's favourite hobby	1	computer games  • play computer	0 alle anderen Antworten 
+429	ERe004a	1. Superheroes are ...	4	nur das 4. Kästchen wurde angekreuzt: d)	1 1. Kästchen angekreuzt 2 2. Kästchen angekreuzt 3 3. Kästchen angekreuzt 
+430	ERe004b	2. Many people like stories about ...	3	nur das 3. Kästchen wurde angekreuzt: c)	1 1. Kästchen angekreuzt 2 2. Kästchen angekreuzt 4 4. Kästchen angekreuzt 
+431	ERe005a	1. When did Lucy finish her apprenticeship?	1	last month	0 alle anderen Antworten
+432	ERe005b	2. Where is the beatuy school?	1	London • in London	0 alle anderen Antworten
+433	ERe005c	3. What can she get at the beauty school?	1	a High School diploma • High School diploma • a diploma • diploma	0 alle anderen Antworten
+434	ERe005d	4. Why does she want to work on a cruise ship?	1	(to get to) (know) (more) international styles	0 alle anderen Antworten 
+435	ERe006a	1. Where do students come from?	1	from many different countries • different countries • many different countries • many different countries	0 alle anderen Antworten
+436	ERe006b	2. What can students do in the afternoon?	1	sports • music • have fun	0 alle anderen Antworten
+437	ERe006c	3. What is the highest number of students per group?	1	12	0 alle anderen Antworten
+438	ERe006d	4. How long are the courses?	1	2 or 4 weeks	0 alle anderen Antworten
+439	ERe006e	5. How much is the longest course?	1	750 • 750 £	0 alle anderen Antworten
+440	ERe006f	6. Until when do you have to book the course?	1	1st of June	0 alle anderen Antworten 
+441	ERe007a	1. On Monday the library is open...	06	f/F	01 a/A 02 b/B 03 c/C 04 d/D 05 e/E 07 g/G 08 h/H 09 i/I 10 j/J
+442	ERe007b	2. If you want to borrow a book...	09	i/I	01 a/A 02 b/B 03 c/C 04 d/D 05 e/E 06 f/F 07 g/G 08 h/H 10 j/J
+443	ERe007c	3. You must read or talk...	05	e/E	01 a/A 02 b/B 03 c/C 04 d/D 06 f/F 07 g/G 08 h/H 09 i/I 10 j/J
+444	ERe007d	4. It is not allowed to...	02	b/B	01 a/A 03 c/C 04 d/D 05 e/E 06 f/F 07 g/G 08 h/H 09 i/I 10 j/J
+445	ERe007e	5. You have to switch off ...	03	c/C	01 a/A 02 b/B 04 d/D 05 e/E 06 f/F 07 g/G 08 h/H 09 i/I 10 j/J
+446	ERe007f	6. It is possible to borrow ...	04	d/D	01 a/A 02 b/B 03 c/C 05 e/E 06 f/F 07 g/G 08 h/H 09 i/I 10 j/J 
+447	ERe008a	She is ...	1	6	0 alle anderen Antworten
+448	ERe008b	She was lost on ...	1	Tuesday • 10th of June	0 alle anderen Antworten • 7pm
+449	ERe008c	She likes to eat ...	1	fish	0 alle anderen Antworten
+450	ERe008d	When you find the cat, you should call ...	1	Linda • Trueman •  012 5438 9237	0 alle anderen Antworten 
+451	ERe009a	1. Karen lives in ...	2	nur das 2. Kästchen wurde angekreuzt: b)	1 1. Kästchen angekreuzt 3 3. Kästchen angekreuzt 4 4. Kästchen angekreuzt 
+452	ERe009b	2. Karen has a dog because the house has ...	1	nur das 1. Kästchen wurde angekreuzt: a)	2 2. Kästchen angekreuzt 3 3. Kästchen angekreuzt 4 4. Kästchen angekreuzt 
+453	ERe009c	3. The name of Karen's dog is ...	4	nur das 4. Kästchen wurde angekreuzt: d)	1 1. Kästchen angekreuzt 2 2. Kästchen angekreuzt 3 3. Kästchen angekreuzt 
+454	ERe009d	4. Karen's dog is ...	3	nur das 3. Kästchen wurde angekreuzt: c)	1 1. Kästchen angekreuzt 2 2. Kästchen angekreuzt 4 4. Kästchen angekreuzt 
+455	ERe009e	5. Karen's dog is ...	4	nur das 4. Kästchen wurde angekreuzt: d)	1 1. Kästchen angekreuzt 2 2. Kästchen angekreuzt 3 3. Kästchen angekreuzt 
+456	ERe009f	6. Karen feeds her dog ...	2	nur das 2. Kästchen wurde angekreuzt: b)	1 1. Kästchen angekreuzt 3 3. Kästchen angekreuzt 4 4. Kästchen angekreuzt 
+457	ERe010a	1. People call him …	01	A/a	02 B/b 03 C/c 04 D/d 05 E/e 06 F/f 07 G/g 08 H/h 09 I/i
+458	ERe010b	2. With 2,13 meters …	04	D/d	01 A/a 02 B/b 03 C/c 05 E/e 06 F/f 07 G/g 08 H/h 09 I/i
+459	ERe010c	3. He always was very good at…	06	F/f	01 A/a 02 B/b 03 C/c 04 D/d 05 E/e 07 G/g 08 H/h 09 I/i
+460	ERe010d	4. At the age of 20…	02	B/b	01 A/a 03 C/c 04 D/d 05 E/e 06 F/f 07 G/g 08 H/h 09 I/i 
+461	ERe011a	1.	01	A/a	02 B/b 03 C/c 04 D/d 05 E/e 06 F/f
+462	ERe011b	2.	05	E/e	01 A/a 02 B/b 03 C/c 04 D/d 06 F/f
+463	ERe011c	3.	06	F/f	01 A/a 02 B/b 03 C/c 04 D/d 05 E/e
+464	ERe011d	4.	02	B/b	01 A/a 03 C/c 04 D/d 05 E/e 06 F/f 
+465	ERe012a	Today Amy is ...	1	nur das 1. Kästchen wurde angekreuzt: a)	2 2. Kästchen angekreuzt 3 3. Kästchen angekreuzt 
+466	ERe012b	yesterday	1	A/a	2 B/b 3 C/c 4 D/d 5 E/e
+467	ERe012c	tomorrow	2	B/b	1 A/a 3 C/c 4 D/d 5 E/e 
+468	ERe013a	The pancakes ...	4	nur das 4. Kästchen wurde angekreuzt: d)	1 1. Kästchen angekreuzt 2 2. Kästchen angekreuzt 3 3. Kästchen angekreuzt 
+469	ERe014a	1. Sam is Jenny´s boyfriend.	1	True	2 False 3 Not given
+470	ERe014b	2. Sam and Jenny live in the same town.	2	False	1 True 3 Not given
+471	ERe014c	3. Sam likes dogs.	3	Not given	1 True 2 False
+472	ERe014d	4. Jenny has a small nose.	1	True	2 False 3 Not given
+473	ERe014e	5. Jenny has a big mouth.	3	Not given	1 True 2 False
+474	ERe014f	6. Jenny loves football.	2	False	1 True 3 Not given
+475	ERe014g	7. Sam does not know what he should do.	1	True	2 False 3 Not given 
+476	ERe015a	1. Jane doesn´t eat meat or fish. As a meal, Jane eats ….	1	vegetable curry • curry • curry with rice • vegetable curry with rice • cheese and tomato pizza with salad • pizza • pizza with salad • cheese and tomato pizza	0 alle anderen Antworten • rice
+477	ERe015b	2. Jane´s mum loves noodles. She eats …	1	meatballs / spaghetti (and tomato sauce)	0 alle anderen Antworten
+478	ERe015c	3. Jane has £ 1 left for a drink. She drinks ...	1	water	0 alle anderen Antworten
+479	ERe015d	4. Jane´s mum wants to drink a juice. Jane´s mum drinks …	1	orange juice	0 alle anderen Antworten
+480	ERe015e	5. Jane and her mum want to have the cheapest dessert. They buy...	1	chocolate cake • cake	0 alle anderen Antworten 
+481	ERe017a	1. From the hotel you can look at...	1	beautiful beaches • beach • beaches • beautiful beach	0 alle anderen Antworten
+482	ERe017b	2. Terrace Hotel is near...	1	city • centre • beaches • beach	0 alle anderen Antworten
+483	ERe017c	3. All the high-quaility rooms have...	1	internet • free internet • flat screen TVs • flat screen TV • TV • TVs	0 alle anderen Antworten
+484	ERe017d	4. You can relax in...	1	their modern fitness club with a heated indoor pool • fitness club with a heated indoor pool • fitness club • their modern fitness club	0 alle anderen Antworten
+485	ERe017e	5. Terrace Hotel helps to organise...	1	your wedding • your weddings • wedding • weddings • a dream wedding	0 alle anderen Antworten 
+486	ERe018a	1. One of the wold's top-earning athletes is a ...	3	nur das 3. Kästchen wurde angekreuzt: c)	1 1. Kästchen angekreuzt 2 2. Kästchen angekreuzt 4 4. Kästchen angekreuzt 
+487	ERe018b	2. The name of this top-earning athlete is ...	2	nur das 2. Kästchen wurde angekreuzt: b)	1 1. Kästchen angekreuzt 3 3. Kästchen angekreuzt 4 4. Kästchen angekreuzt 
+488	ERe018c	3. The athlete played for ... in the NBA.	4	nur das 4. Kästchen wurde angekreuzt: d)	1 1. Kästchen angekreuzt 2 2. Kästchen angekreuzt 3 3. Kästchen angekreuzt 
+489	ERe018d	4. With Gatorade, Hanes and Nike the athlete has ...	2	nur das 2. Kästchen wurde angekreuzt: b)	1 1. Kästchen angekreuzt 3 3. Kästchen angekreuzt 4 4. Kästchen angekreuzt 
+490	ERe019a	1.	03	C/c	01 A/a 02 B/b 04 D/d 05 E/e 06 F/f
+491	ERe019b	2.	01	A/a	02 B/b 03 C/c 04 D/d 05 E/e 06 F/f
+492	ERe019c	3.	05	E/e	01 A/a 02 B/b 03 C/c 04 D/d 06 F/f
+493	ERe019d	4.	04	D/d	01 A/a 02 B/b 03 C/c 05 E/e 06 F/f 
+494	ERe020a	1. When did Simon take singing lessons?	1	in summer • summer • last summer	0 alle anderen Antworten
+495	ERe020b	2. Where did Simon take singing lessons?	1	London • in London	0 alle anderen Antworten
+496	ERe020c	3. Where does Simon sing now?	1	• school band • in his school band • in the school band • in our school band	0 alle anderen Antworten
+497	ERe020d	4. What will be in February?	1	casting show • a BBC casting show • the BBC casting show • BBC casting show • a casting show • the casting show	0 alle anderen Antworten 
+498	ERe021a	"1. ""Tidy up: Drinks, scissors, exercise books, your bread - everything is on your table!"""	04	D/d	01 A/a 02 B/b 03 C/c 05 E/e 06 F/f 07 G/g
+499	ERe021b	"2. ""Don't talk to your neighbours."""	03	C/c	01 A/a 02 B/b 04 D/d 05 E/e 06 F/f 07 G/g
+500	ERe021c	"3. ""Oh please! Don't eat now! Put away your drink and your apple."""	06	F/f	01 A/a 02 B/b 03 C/c 04 D/d 05 E/e 07 G/g
+501	ERe021d	"4. ""It's nine o'clock now. You are too late!"""	01	A/a	02 B/b 03 C/c 04 D/d 05 E/e 06 F/f 07 G/g
+502	ERe021e	"5. ""You had to prepare maths for this lesson! Where is it?"""	07	G/g	01 A/a 02 B/b 03 C/c 04 D/d 05 E/e 06 F/f 
+503	ERe022a	1. Patrick’s postcard is ...	05	E/e	01 A/a 02 B/b 03 C/c 04 D/d 06 F/f 07 G/g 08 H/h 09 I/i
+504	ERe022b	2. Patrick’s hotel is ...	07	G/g	01 A/a 02 B/b 03 C/c 04 D/d 05 E/e 06 F/f 08 H/h 09 I/i
+505	ERe022c	3. The weather in Paris ...	04	D/d	01 A/a 02 B/b 03 C/c 05 E/e 06 F/f 07 G/g 08 H/h 09 I/i
+506	ERe022d	4. Patrick loves ...	06	F/f	01 A/a 02 B/b 03 C/c 04 D/d 05 E/e 07 G/g 08 H/h 09 I/i
+507	ERe022e	5. He does not like ...	08	H/h	01 A/a 02 B/b 03 C/c 04 D/d 05 E/e 06 F/f 07 G/g 09 I/i
+508	ERe022f	6. Patrick will be home ...	09	I/i	01 A/a 02 B/b 03 C/c 04 D/d 05 E/e 06 F/f 07 G/g 08 H/h 
+509	ERe023a	1. Who is the invitation for?	3	nur das 3. Kästchen wurde angekreuzt: c)	1 1. Kästchen angekreuzt 2 2. Kästchen angekreuzt 4 4. Kästchen angekreuzt 
+510	ERe023b	2. When is the birthday party?	2	nur das 2. Kästchen wurde angekreuzt: b)	1 1. Kästchen angekreuzt 3 3. Kästchen angekreuzt 4 4. Kästchen angekreuzt 
+511	ERe023c	3. When does the party start?	4	nur das 4. Kästchen wurde angekreuzt: d)	1 1. Kästchen angekreuzt 2 2. Kästchen angekreuzt 3 3. Kästchen angekreuzt 
+512	ERe023d	4. Where does Gillian live?	4	nur das 4. Kästchen wurde angekreuzt: d)	1 1. Kästchen angekreuzt 2 2. Kästchen angekreuzt 3 3. Kästchen angekreuzt 
+513	ERe023e	5. Who is going to take all the guests home?	2	nur das 2. Kästchen wurde angekreuzt: b)	1 1. Kästchen angekreuzt 3 3. Kästchen angekreuzt 4 4. Kästchen angekreuzt 
+514	ERe024a	1. What is in the fridge?	1	Tom's lunch • lunch	0 alle anderen Antworten
+515	ERe024b	2. What does Granny need help with?	1	shopping	0 alle anderen Antworten
+516	ERe024c	3. Who needs some fresh water?	1	Blacky	0 alle anderen Antworten
+517	ERe024d	4. When will Mum be home?	1	at 9 pm • 21 h • at 9 • 9 pm • 9  • at 21 h	0 alle anderen Antworten 
+518	ERe025a	1. The name of Megan’s mum is ... .	1	Susan • Susan Miller	0 alle anderen Antworten • Ms Miller
+519	ERe025b	2. Adam Miller works as a ... .	1	policeman	0 alle anderen Antworten
+520	ERe025c	3. Megan is ... years old.	1	15	0 alle anderen Antworten
+521	ERe025d	4. Megan’s pet is a ... .	1	cat • Pinky	0 alle anderen Antworten
+522	ERe025e	5. The youngest children are ... and Anthony.	1	Charly	0 alle anderen Antworten
+523	ERe025f	6. The oldest child in the family is ... .	1	Megan	0 alle anderen Antworten 
+524	ERe026a	1. bread	05	E/e	01 A/a 02 B/b 03 C/c 04 D/d 06 F/f 07 G/g 08 H/h 09 I/i
+525	ERe026b	2. eggs	07	G/g	01 A/a 02 B/b 03 C/c 04 D/d 05 E/e 06 F/f 08 H/h 09 I/i
+526	ERe026c	3. cheese	09	I/i	01 A/a 02 B/b 03 C/c 04 D/d 05 E/e 06 F/f 07 G/g 08 H/h
+527	ERe026d	4. lemonade	06	F/f	01 A/a 02 B/b 03 C/c 04 D/d 05 E/e 07 G/g 08 H/h 09 I/i
+528	ERe026e	5. fish	04	D/d	01 A/a 02 B/b 03 C/c 05 E/e 06 F/f 07 G/g 08 H/h 09 I/i
+529	ERe026f	6. apple juice	01	A/a	02 B/b 03 C/c 04 D/d 05 E/e 06 F/f 07 G/g 08 H/h 09 I/i 
+530	ERe027a	1. What is the student’s name?	1	Olivia • Smith	0 alle anderen Antworten
+531	ERe027b	2. When is the girl born?	1	20 February  •  in February •  February •  in February 2005 • 20 February 2005 • 2005 • February 2005	0 alle anderen Antworten
+532	ERe027c	3. Who is Mr. Brown?	1	teacher • Olivia's class teacher	0 alle anderen Antworten
+533	ERe027d	4. Where does the girl live?	1	at 8 Park Road Birmingham • at 8 Park Road • Park Road • Birmingham	0 alle anderen Antworten 
+534	ERe028aa	1. Julia will prepare the Maths homework.	1	True	2 False
+535	ERe028ab	2. Oliver will look for information for German.	2	False	1 True
+536	ERe028ba	3. Julia asks for eating and drinking.	1	True	2 False
+537	ERe028bb	4. Oliver offers the sandwiches.	1	True	2 False
+538	ERe028ca	5. Julia will buy a tiramisu.	2	False	1 True
+539	ERe028cb	6. They meet at Oliver's at six o'clock.	1	True	2 False 
+540	ERe029a	1. Grandpa is working in the ...	1	nur das 1. Kästchen wurde angekreuzt: a)	2 2. Kästchen angekreuzt 3 3. Kästchen angekreuzt 
+541	ERe029b	2. The black cat is sitting on the ...	3	nur das 3. Kästchen wurde angekreuzt: c)	1 1. Kästchen angekreuzt 2 2. Kästchen angekreuzt 
+542	ERe029c	3. Mum is standing in the ...	2	nur das 2. Kästchen wurde angekreuzt: b)	1 1. Kästchen angekreuzt 3 3. Kästchen angekreuzt 
+543	ERe029d	4. The dog is lying in the ...	2	nur das 2. Kästchen wurde angekreuzt: b)	1 1. Kästchen angekreuzt 3 3. Kästchen angekreuzt 
