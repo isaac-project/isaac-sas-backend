@@ -5,6 +5,7 @@ from cassis.typesystem import Type
 from typing import List
 from features import uima
 from collections import OrderedDict
+import math
 
 class AlignmentLabel(Enum):
     LC_TOKEN = auto()
@@ -66,7 +67,11 @@ class Outcome(FeatureExtractor):
         if score in Outcome.LABEL2INT:
             return ("Outcome", Outcome.LABEL2INT[score])
         else:
-            return ("Outcome", float(answer.contentScore))
+            try:
+                outcome = float(score)
+            except ValueError:
+                outcome = math.nan
+            return ("Outcome", outcome)
             #todo:changed this to float()   File "/home/akrnshva/git/isaac-ml-service/features/extractor.py", line 69, in extract
             # return ("Outcome", int(answer.contentScore))
             # ValueError: invalid literal for int() with base 10: '-98.0'
