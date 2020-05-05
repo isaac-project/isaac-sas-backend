@@ -4,15 +4,29 @@ from iqb_saa_benchmarks import *
 
 
 if __name__=="__main__":
-    iqb_data = read_iqb_data("iqb-tba-answers-doublequotes.tsv")
-    var_data = pd.read_csv("varinfo.tsv", sep='\t')
+    with open("table_with_results_1.txt") as file:
+        bla = file.readlines()
+        print(bla)
+        b = bla.split("----------------------")
+        print(b)
+        final = {}
+        classifier_results = []
+        clas_name = ""
+        for n in bla:
+            if n.endswith("_bow") or n.endswith("_sim"):
+                if len(classifier_results) != 0:
+                    final[clas_name] = classifier_results
+                    classifier_results = []
+                    clas_name = n
+                else:
+                    clas_name = n
+            else:
+                classifier_results.append(n)
+        for i in final.keys():
+            print("---------------PRINTING :{}".format(i))
+            for x in final[i]:
+                print(x)
+            print("-------------------------------------------")
 
-    a = iqb_data["value.raw"]
-    print(a.iloc[5239])
-    print(a.iloc[38455])
-    print(a.iloc[7046])
-    print(a.iloc[50822])
-    print(a.iloc[50823])
-    print(a.iloc[50824])
 
-    write_to_csv("iqb-tba-answers-with-meta-doublequotes.tsv")
+

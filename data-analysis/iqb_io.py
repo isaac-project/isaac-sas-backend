@@ -20,7 +20,7 @@ SCORE_COLUMN = 'targets_value'
 TARGET_COLUMN = 'targets'
 NON_TARGET_COLUMN = 'non_targets'
 
-def read_iqb_data(filename: str = "iqb-tba-answers-doublequotes.tsv") -> pd.DataFrame: #"/home/rziai/git/iqb-tba-data/iqb-tba-answers.tsv") -> pd.DataFrame:
+def read_iqb_data(filename: str = "data/original_data/iqb-tba-answers-doublequotes.tsv") -> pd.DataFrame: #"/home/rziai/git/iqb-tba-data/iqb-tba-answers.tsv") -> pd.DataFrame:
     df = pd.read_csv(filename,
                      dtype={'variable': 'category',
                             'ID': 'category',
@@ -84,6 +84,16 @@ def parse_variable_data(filename: str = "/home/rziai/git/iqb-tba-data/BT fuer UT
     vardata[NON_TARGET_COLUMN].append(" ".join(current_non_target_strs))
     print(vardata)
     return pd.DataFrame.from_dict(vardata)
+
+def read_varinfo(filename):
+    return pd.read_table(filename,
+                         dtype={'variable': 'category',
+                                   'variable_codebook': 'category',
+                                   'prompt': 'str',
+                                   'targets_value': 'int',  # todo: change to string?
+                                   'targets': 'str',
+                                   'non_targets': 'str',
+                                   }, encoding='utf8', sep="\t")
 
 def merge():
     df = read_iqb_data()
