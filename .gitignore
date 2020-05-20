@@ -4,5 +4,6 @@
 __pycache__/
 *.pyc
 data/*.tsv
+data-analysis/data/*
 data/xmi/
 .cache/
