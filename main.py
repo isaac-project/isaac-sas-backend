@@ -49,6 +49,25 @@ lock = Lock()
 model_columns = {}
 clf = {} # model objects
 
+# load existing models
+try:
+    for f in os.listdir(model_directory):
+        if f.endswith(".pkl"):
+            if "_columns" in f:
+                model_id = f[:-12]
+                model_columns[model_id] = joblib.load('{}/{}_columns.pkl'.format(model_directory, model_id))
+                print('model columns {} loaded'.format(model_id))
+            else:
+                model_id = f[:-4]
+                clf[model_id] = joblib.load('{}/{}.pkl'.format(model_directory, model_id))
+                print('model {} loaded'.format(model_id))
+
+except Exception as e:
+    print('No model here')
+    print('Train first')
+    print(str(e))
+
+
 
 def do_prediction(data: DataFrame, model_id: str = None) -> list:
     query = pd.get_dummies(data)
@@ -199,22 +218,5 @@ if __name__ == '__main__':
         port = int(sys.argv[1])
     except Exception as e:
         port = 80
-
-    try:
-        for f in os.listdir(model_directory):
-            if f.endswith(".pkl"):
-                if "_columns" in f:
-                    model_id = f[:-12]
-                    model_columns[model_id] = joblib.load('{}/{}_columns.pkl'.format(model_directory, model_id))
-                    print('model columns {} loaded'.format(model_id))
-                else:
-                    model_id = f[:-4]
-                    clf[model_id] = joblib.load('{}/{}.pkl'.format(model_directory, model_id))
-                    print('model {} loaded'.format(model_id))
-
-    except Exception as e:
-        print('No model here')
-        print('Train first')
-        print(str(e))
 
     app.run(host='0.0.0.0', port=port, debug=True)
