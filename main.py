@@ -69,7 +69,7 @@ except Exception as e:
 
 
 
-def do_prediction(data: DataFrame, model_id: str = None) -> list:
+def do_prediction(data: DataFrame, model_id: str = None) -> dict:
     query = pd.get_dummies(data)
     if not model_id:
         model_id = model_default_name
@@ -78,7 +78,13 @@ def do_prediction(data: DataFrame, model_id: str = None) -> list:
     # Thanks to @lorenzori
     query = query.reindex(columns=model_columns[model_id], fill_value=0)
 
-    return list(clf[model_id].predict(query))
+    # get prediction as class probability distribution and map to classes
+    probs = dict(zip(
+        map(str,clf[model_id].classes_),
+        map(float,clf[model_id].predict_proba(query)[0])))
+
+    # prediction is the class with max probability
+    return {"prediction":max(probs, key=lambda k: probs[k]), "classProbabilities":probs}
 
 
 @app.route('/predict', methods=['POST'])
@@ -102,15 +108,13 @@ def predict():
         print("extracted feats")
         data = pd.DataFrame.from_dict(feats)
         prediction = do_prediction(data, model_id_)
-
-        # Converting to int from int64
-        print(jsonify({"prediction": list(map(int, prediction))}))
-        return jsonify({"prediction": list(map(int, prediction))})
+        prediction["features"] = {k: v[0] for k,v in feats.items()}
+        print(prediction)
+        return jsonify(prediction)
 
     else:
         print('train first')
         return 'no model here'
-
 
 @app.route('/addInstance', methods=['POST'])
 def addInstance():
