@@ -7,3 +7,4 @@ data/*.tsv
 data-analysis/data/*
 data/xmi/
 .cache/
+/env
