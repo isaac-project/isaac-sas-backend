@@ -2,25 +2,25 @@ import sys
 import os
 import shutil
 import time
-import traceback
 import base64
-import json
-from flask import Flask, request, jsonify
 import pandas as pd
 from sklearn.externals import joblib
+import uvicorn
 
+from fastapi import FastAPI
 from features import uima
 from features.extractor import FeatureExtraction
 from cassis.xmi import load_cas_from_xmi
 from io import BytesIO
 from pandas.core.frame import DataFrame
+from pydantic import BaseModel
 
 try:
     from _thread import allocate_lock as Lock
 except:
     from _dummy_thread import allocate_lock as Lock
 
-app = Flask(__name__)
+app = FastAPI()
 
 # inputs
 training_data = 'data/gold-standard-features.tsv'
@@ -87,13 +87,17 @@ def do_prediction(data: DataFrame, model_id: str = None) -> dict:
     return {"prediction":max(probs, key=lambda k: probs[k]), "classProbabilities":probs}
 
 
-@app.route('/predict', methods=['POST'])
-def predict():
+class PredictRequest(BaseModel):
+    model_id: str
+    cas: str
+
+
+@app.post("/predict")
+def predict(req: PredictRequest):
     if clf:
     #try: # todo: maybe uncomment and try running it again ?
-        json_ = request.json
-        model_id_ = json_["modelId"]
-        base64_cas = base64.b64decode(json_["cas"])
+        model_id_ = req.model_id
+        base64_cas = base64.b64decode(req.cas)
 
         # TODO: maybe check if modelId is in models, if not, do not proceed? See if the error gets passed on to REST service
         if model_id not in clf:
@@ -110,17 +114,24 @@ def predict():
         prediction = do_prediction(data, model_id_)
         prediction["features"] = {k: v[0] for k,v in feats.items()}
         print(prediction)
-        return jsonify(prediction)
+        # Note that I have removed the jsonify function here because I think the
+        # dictionary format returned is sufficient. Not 100% sure that this is how you want it, though.
+        return prediction
 
     else:
         print('train first')
         return 'no model here'
 
-@app.route('/addInstance', methods=['POST'])
-def addInstance():
-    json_cas = request.json
-    model_id = json_cas["modelId"]
-    base64_string = base64.b64decode(json_cas["cas"])
+# Todo: This model could be treated the same as the PredictRequestModel because it has the exact same format.
+class AddInstanceRequest(BaseModel):
+    model_id: str
+    cas: str
+
+
+@app.post("/addInstance")
+def addInstance(req: AddInstanceRequest):
+    model_id = req.model_id
+    base64_string = base64.b64decode(req.cas)
 
     if not model_id: # todo: changed b/c there should always be a modelId
         return 'No model id passed as argument. Please include a modelId', 400
@@ -139,9 +150,13 @@ def addInstance():
     return "Successfully added cas to model {}".format(model_id)
 
 
-@app.route('/trainFromCASes', methods=['GET'])
-def trainFromCASes():
-    model_id = request.args.get('modelId')
+class TrainFromCASRequest(BaseModel):
+    model_id: str
+
+
+@app.post('/trainFromCASes')
+def trainFromCASes(req: TrainFromCASRequest):
+    model_id = req.model_id
     if not model_id: # todo: changed b/c there should always be a modelId
         # model_id = model_default_name
         return 'No model id passed as argument. Please include a modelId', 400
@@ -198,14 +213,14 @@ def do_training(df: DataFrame, model_id: str = None) -> str:
     return return_message
 
 
-@app.route('/train', methods=['GET'])
+@app.get('/train')
 def train():
     print("Training")
     df = pd.read_table(training_data)
     return do_training(df, None)
 
 
-@app.route('/wipe', methods=['GET'])
+@app.get('/wipe')
 def wipe():
     try:
         shutil.rmtree(model_directory)
@@ -223,4 +238,4 @@ if __name__ == '__main__':
     except Exception as e:
         port = 80
 
-    app.run(host='0.0.0.0', port=port, debug=True)
+    uvicorn.run(app="main:app", port=port, reload=True)
