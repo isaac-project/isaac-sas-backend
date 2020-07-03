@@ -114,8 +114,6 @@ def predict(req: PredictRequest):
         prediction = do_prediction(data, model_id_)
         prediction["features"] = {k: v[0] for k,v in feats.items()}
         print(prediction)
-        # Note that I have removed the jsonify function here because I think the
-        # dictionary format returned is sufficient. Not 100% sure that this is how you want it, though.
         return prediction
 
     else:
