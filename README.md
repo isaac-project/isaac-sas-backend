@@ -4,7 +4,8 @@ This is a fork of sklearnflask, intended to be used as ML backend for UIMA-based
 
 ### Dependencies
 - scikit-learn
-- Flask
+- fastapi
+- uvicorn
 - pandas
 - numpy
 - dkpro-cassis
