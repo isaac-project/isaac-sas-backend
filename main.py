@@ -14,6 +14,7 @@ from cassis.xmi import load_cas_from_xmi
 from io import BytesIO
 from pandas.core.frame import DataFrame
 from pydantic import BaseModel
+from typing import Dict
 
 try:
     from _thread import allocate_lock as Lock
@@ -92,7 +93,13 @@ class PredictRequest(BaseModel):
     cas: str
 
 
-@app.post("/predict")
+class PredictResponse(BaseModel):
+    # Todo: @Ramon Please check if I chose the data types correctly.
+    prediction: float
+    class_probs: Dict
+
+
+@app.post("/predict", response_model=PredictResponse)
 def predict(req: PredictRequest):
     if clf:
     #try: # todo: maybe uncomment and try running it again ?
