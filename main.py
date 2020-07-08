@@ -69,6 +69,19 @@ except Exception as e:
     print(str(e))
 
 
+class ClassificationInstance(BaseModel):
+    model_id: str
+    cas: str
+
+
+class CASPrediction(BaseModel):
+    prediction: str
+    class_probs: Dict[str, float]
+
+
+class TrainFromCASRequest(BaseModel):
+    model_id: str
+
 
 def do_prediction(data: DataFrame, model_id: str = None) -> dict:
     query = pd.get_dummies(data)
@@ -88,19 +101,8 @@ def do_prediction(data: DataFrame, model_id: str = None) -> dict:
     return {"prediction":max(probs, key=lambda k: probs[k]), "classProbabilities":probs}
 
 
-class PredictRequest(BaseModel):
-    model_id: str
-    cas: str
-
-
-class PredictResponse(BaseModel):
-    # Todo: @Ramon Please check if I chose the data types correctly.
-    prediction: float
-    class_probs: Dict
-
-
-@app.post("/predict", response_model=PredictResponse)
-def predict(req: PredictRequest):
+@app.post("/predict", response_model=CASPrediction)
+def predict(req: ClassificationInstance):
     if clf:
     #try: # todo: maybe uncomment and try running it again ?
         model_id_ = req.model_id
@@ -127,14 +129,9 @@ def predict(req: PredictRequest):
         print('train first')
         return 'no model here'
 
-# Todo: This model could be treated the same as the PredictRequestModel because it has the exact same format.
-class AddInstanceRequest(BaseModel):
-    model_id: str
-    cas: str
-
 
 @app.post("/addInstance")
-def addInstance(req: AddInstanceRequest):
+def addInstance(req: ClassificationInstance):
     model_id = req.model_id
     base64_string = base64.b64decode(req.cas)
 
@@ -153,10 +150,6 @@ def addInstance(req: AddInstanceRequest):
             features[model_id] = feats
     print("Successfully added cas to model {}".format(model_id))
     return "Successfully added cas to model {}".format(model_id)
-
-
-class TrainFromCASRequest(BaseModel):
-    model_id: str
 
 
 @app.post('/trainFromCASes')
