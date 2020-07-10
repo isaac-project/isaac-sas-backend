@@ -1,11 +1,9 @@
-import sys
 import os
 import shutil
 import time
 import base64
 import pandas as pd
 from sklearn.externals import joblib
-import uvicorn
 
 from fastapi import FastAPI
 from features import uima
@@ -228,12 +226,3 @@ def wipe():
     except Exception as e:
         print(str(e))
         return 'Could not remove and recreate the model directory'
-
-
-if __name__ == '__main__':
-    try:
-        port = int(sys.argv[1])
-    except Exception as e:
-        port = 80
-
-    uvicorn.run(app="main:app", port=port, reload=True)
