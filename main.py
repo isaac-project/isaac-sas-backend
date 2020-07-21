@@ -6,6 +6,7 @@ import pandas as pd
 from sklearn.externals import joblib
 
 from fastapi import FastAPI
+from fastapi import HTTPException
 from features import uima
 from features.extractor import FeatureExtraction
 from cassis.xmi import load_cas_from_xmi
@@ -107,8 +108,12 @@ def predict(req: ClassificationInstance):
         base64_cas = base64.b64decode(req.cas)
 
         # TODO: maybe check if modelId is in models, if not, do not proceed? See if the error gets passed on to REST service
+        # I chose HTTP error 422 ("Unprocessable Entity") for this case.
+        # Maybe there is an error code that is more applicable but I didn't find.
         if model_id not in clf:
-            return "Model with modelId \"{}\" has not been trained yet. Please train first".format(model_id_)
+            raise HTTPException(status_code=422,
+                                detail="Model with modelId \"{}\" has not been trained yet."
+                                       " Please train first".format(model_id_))
 
         print("printing deseralized json cas modelID: ", model_id_)
 
@@ -124,8 +129,8 @@ def predict(req: ClassificationInstance):
         return prediction
 
     else:
-        print('train first')
-        return 'no model here'
+        raise HTTPException(status_code=400, detail="Train first.\n"
+                                                    "No model here.")
 
 
 @app.post("/addInstance")
@@ -134,7 +139,8 @@ def addInstance(req: ClassificationInstance):
     base64_string = base64.b64decode(req.cas)
 
     if not model_id: # todo: changed b/c there should always be a modelId
-        return 'No model id passed as argument. Please include a modelId', 400
+        raise HTTPException(status_code=400, detail="No model ID passed as argument."
+                                                    " Please include a model ID.")
 
     cas = load_cas_from_xmi(BytesIO(base64_string), typesystem=isaac_ts)
     feats = extraction.from_cases([cas])
@@ -155,15 +161,17 @@ def trainFromCASes(req: TrainFromCASRequest):
     model_id = req.model_id
     if not model_id: # todo: changed b/c there should always be a modelId
         # model_id = model_default_name
-        return 'No model id passed as argument. Please include a modelId', 400
-    if features[model_id]:
+        raise HTTPException(status_code=400, detail="No model id passed as argument. "
+                                                    "Please include a modelId")
+    if features.get(model_id):
         print("type of features[model_id] in trainFromCASes: ", type(features[model_id]))
         data = pd.DataFrame.from_dict(features[model_id])
         print("type of data in trainFromCASes (after DataFrame.from_dict: ", type(data))
         return do_training(data, model_id)
     else:
-        print('add CAS instances first')
-        return 'No model here with id {}'.format(model_id) + '. Add CAS instances first.'
+        raise HTTPException(status_code=422, detail="No model here with id {}"
+                            .format(model_id) + ". Add CAS instances first.")
+
 
 def do_training(df: DataFrame, model_id: str = None) -> str:
     # using random forest as an example
@@ -212,6 +220,8 @@ def do_training(df: DataFrame, model_id: str = None) -> str:
 @app.get('/train')
 def train():
     print("Training")
+    # Fixme: When running the test on this function I get a depracation warning
+    #        for the function read_table. (read_csv is recommended)
     df = pd.read_table(training_data)
     return do_training(df, None)
 
@@ -225,4 +235,5 @@ def wipe():
 
     except Exception as e:
         print(str(e))
-        return 'Could not remove and recreate the model directory'
+        raise HTTPException(status_code=400, detail="Could not remove and recreate the"
+                                                    " model directory")
