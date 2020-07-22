@@ -110,7 +110,7 @@ def predict(req: ClassificationInstance):
         # TODO: maybe check if modelId is in models, if not, do not proceed? See if the error gets passed on to REST service
         # I chose HTTP error 422 ("Unprocessable Entity") for this case.
         # Maybe there is an error code that is more applicable but I didn't find.
-        if model_id not in clf:
+        if model_id_ not in clf:
             raise HTTPException(status_code=422,
                                 detail="Model with modelId \"{}\" has not been trained yet."
                                        " Please train first".format(model_id_))
