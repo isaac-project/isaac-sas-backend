@@ -18,20 +18,20 @@ def xmi_bytes():
     return xmi_bytes
 
 
-@pytest.mark.skip(reason="Not  possible to send base64 string through json yet.")
+#@pytest.mark.skip(reason="Not  possible to send base64 string through json yet.")
 def test_predict(client, xmi_bytes):
     encoded_bytes = base64.b64encode(xmi_bytes)
-    instance_dict = {"model_id": "default", "cas": encoded_bytes}
+    instance_dict = {"model_id": "default", "cas": encoded_bytes.decode('ascii')}
     response = client.post("/predict", json=instance_dict)
 
 
     assert response.status_code == 200
 
 
-@pytest.mark.skip(reason="Not  possible to send base64 string through json yet.")
+#@pytest.mark.skip(reason="Not  possible to send base64 string through json yet.")
 def test_predict_wrong_model_ID(client, xmi_bytes):
     encoded_bytes = base64.b64encode(xmi_bytes)
-    instance_dict = {"model_id": "non-existent", "cas": encoded_bytes}
+    instance_dict = {"model_id": "non-existent", "cas": encoded_bytes.decode('ascii')}
     response = client.post("/predict", json=instance_dict)
 
     assert response.status_code == 422
@@ -54,19 +54,19 @@ def test_predict_no_model(client, xmi_bytes):
     assert json.loads(response.text)["detail"] == "Train first.\nNo model here."
 
 
-@pytest.mark.skip(reason="Not possible to send base64 string through json yet.")
+#@pytest.mark.skip(reason="Not possible to send base64 string through json yet.")
 def test_addInstance(client, xmi_bytes):
     encoded_bytes = base64.b64encode(xmi_bytes)
-    instance_dict = {"model_id": "default", "cas": encoded_bytes}
+    instance_dict = {"model_id": "default", "cas": encoded_bytes.decode('ascii')}
     response = client.post("/addInstance", json=instance_dict)
 
     assert response.status_code == 200
 
 
-@pytest.mark.skip(reason="Not possible to send base64 string through json yet.")
+#@pytest.mark.skip(reason="Not possible to send base64 string through json yet.")
 def test_addInstance_no_model_ID(client, xmi_bytes):
     encoded_bytes = base64.b64encode(xmi_bytes)
-    instance_dict = {"model_id": "", "cas": encoded_bytes}
+    instance_dict = {"model_id": "", "cas": encoded_bytes.decode('ascii')}
     response = client.post("/addInstance", json=instance_dict)
 
     assert response.status_code == 400
