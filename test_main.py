@@ -1,6 +1,7 @@
 import base64
 import json
 import pytest
+import main
 
 from fastapi.testclient import TestClient
 from main import app
@@ -18,7 +19,6 @@ def xmi_bytes():
     return xmi_bytes
 
 
-#@pytest.mark.skip(reason="Not  possible to send base64 string through json yet.")
 def test_predict(client, xmi_bytes):
     encoded_bytes = base64.b64encode(xmi_bytes)
     instance_dict = {"model_id": "default", "cas": encoded_bytes.decode('ascii')}
@@ -28,7 +28,6 @@ def test_predict(client, xmi_bytes):
     assert response.status_code == 200
 
 
-#@pytest.mark.skip(reason="Not  possible to send base64 string through json yet.")
 def test_predict_wrong_model_ID(client, xmi_bytes):
     encoded_bytes = base64.b64encode(xmi_bytes)
     instance_dict = {"model_id": "non-existent", "cas": encoded_bytes.decode('ascii')}
@@ -36,25 +35,25 @@ def test_predict_wrong_model_ID(client, xmi_bytes):
 
     assert response.status_code == 422
     assert (
-        json.loads(response.text)["detail"] == "Model with modelId non-existent has "
+        json.loads(response.text)["detail"] == "Model with modelId \"non-existent\" has "
         "not been trained yet. Please train first"
     )
 
 
-@pytest.mark.skip(
-    reason="This is hard to test because the 'clf' dictionary"
-    "is bound directly to main.py and not to a function or class."
-)
 def test_predict_no_model(client, xmi_bytes):
     encoded_bytes = base64.b64encode(xmi_bytes)
-    instance_dict = {"model_id": "", "cas": encoded_bytes}
+    # Pretend that main.clf is empty but store its value to put back in later.
+    temp_clf = main.clf
+    main.clf = {}
+    instance_dict = {"model_id": "", "cas": encoded_bytes.decode("ascii")}
     response = client.post("/predict", json=instance_dict)
+    # Put the original values back into main.clf.
+    main.clf = temp_clf
 
     assert response.status_code == 400
     assert json.loads(response.text)["detail"] == "Train first.\nNo model here."
 
 
-#@pytest.mark.skip(reason="Not possible to send base64 string through json yet.")
 def test_addInstance(client, xmi_bytes):
     encoded_bytes = base64.b64encode(xmi_bytes)
     instance_dict = {"model_id": "default", "cas": encoded_bytes.decode('ascii')}
@@ -63,7 +62,6 @@ def test_addInstance(client, xmi_bytes):
     assert response.status_code == 200
 
 
-#@pytest.mark.skip(reason="Not possible to send base64 string through json yet.")
 def test_addInstance_no_model_ID(client, xmi_bytes):
     encoded_bytes = base64.b64encode(xmi_bytes)
     instance_dict = {"model_id": "", "cas": encoded_bytes.decode('ascii')}
@@ -76,25 +74,22 @@ def test_addInstance_no_model_ID(client, xmi_bytes):
     )
 
 
-@pytest.mark.skip(
-    reason="For this test to work a CAS instance must be added,"
-    "which also requires sending the base64 string."
-)
 def test_train_from_CASes(client):
     # Todo: Add CAS instance here.
     instance_dict = {"model_id": "default"}
     response = client.post("/trainFromCASes", json=instance_dict)
 
     assert response.status_code == 200
-    assert (
-        json.loads(response.text)["detail"] == "No model here with id"
-        " default. Add CAS instances first."
-    )
 
 
 def test_train_from_CASes_missing_CAS_instance(client):
     instance_dict = {"model_id": "default"}
+    # Pretend that main.features is empty but store its value to put back in later.
+    temp_features = main.features
+    main.features = {}
     response = client.post("/trainFromCASes", json=instance_dict)
+    # Put the original values back into main.clf.
+    main.features = temp_features
 
     assert response.status_code == 422
     assert (

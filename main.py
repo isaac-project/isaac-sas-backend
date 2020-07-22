@@ -75,7 +75,8 @@ class ClassificationInstance(BaseModel):
 
 class CASPrediction(BaseModel):
     prediction: str
-    class_probs: Dict[str, float]
+    classProbabilities: Dict[str, float]
+    features: Dict
 
 
 class TrainFromCASRequest(BaseModel):
