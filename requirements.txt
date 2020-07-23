@@ -1,8 +1,7 @@
-fastapi
-numpy
-pandas
-scikit-learn
-joblib
-dkpro-cassis
-pytest
+fastapi==0.58.1
+numpy==1.16.3
+pandas==0.24.2
+scikit-learn==0.20.3
+dkpro-cassis==0.2.9
+pytest==5.4.3
 requests

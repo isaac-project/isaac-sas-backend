@@ -3,7 +3,7 @@ import shutil
 import time
 import base64
 import pandas as pd
-import joblib
+from sklearn.externals import joblib
 
 from fastapi import FastAPI
 from fastapi import HTTPException
