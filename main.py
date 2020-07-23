@@ -1,26 +1,26 @@
-import sys
 import os
 import shutil
 import time
-import traceback
 import base64
-import json
-from flask import Flask, request, jsonify
 import pandas as pd
 from sklearn.externals import joblib
 
+from fastapi import FastAPI
+from fastapi import HTTPException
 from features import uima
 from features.extractor import FeatureExtraction
 from cassis.xmi import load_cas_from_xmi
 from io import BytesIO
 from pandas.core.frame import DataFrame
+from pydantic import BaseModel
+from typing import Dict
 
 try:
     from _thread import allocate_lock as Lock
 except:
     from _dummy_thread import allocate_lock as Lock
 
-app = Flask(__name__)
+app = FastAPI()
 
 # inputs
 training_data = 'data/gold-standard-features.tsv'
@@ -68,6 +68,20 @@ except Exception as e:
     print(str(e))
 
 
+class ClassificationInstance(BaseModel):
+    model_id: str
+    cas: str
+
+
+class CASPrediction(BaseModel):
+    prediction: str
+    classProbabilities: Dict[str, float]
+    features: Dict
+
+
+class TrainFromCASRequest(BaseModel):
+    model_id: str
+
 
 def do_prediction(data: DataFrame, model_id: str = None) -> dict:
     query = pd.get_dummies(data)
@@ -87,17 +101,20 @@ def do_prediction(data: DataFrame, model_id: str = None) -> dict:
     return {"prediction":max(probs, key=lambda k: probs[k]), "classProbabilities":probs}
 
 
-@app.route('/predict', methods=['POST'])
-def predict():
+@app.post("/predict", response_model=CASPrediction)
+def predict(req: ClassificationInstance):
     if clf:
     #try: # todo: maybe uncomment and try running it again ?
-        json_ = request.json
-        model_id_ = json_["modelId"]
-        base64_cas = base64.b64decode(json_["cas"])
+        model_id_ = req.model_id
+        base64_cas = base64.b64decode(req.cas)
 
         # TODO: maybe check if modelId is in models, if not, do not proceed? See if the error gets passed on to REST service
-        if model_id not in clf:
-            return "Model with modelId \"{}\" has not been trained yet. Please train first".format(model_id_)
+        # I chose HTTP error 422 ("Unprocessable Entity") for this case.
+        # Maybe there is an error code that is more applicable but I didn't find.
+        if model_id_ not in clf:
+            raise HTTPException(status_code=422,
+                                detail="Model with modelId \"{}\" has not been trained yet."
+                                       " Please train first".format(model_id_))
 
         print("printing deseralized json cas modelID: ", model_id_)
 
@@ -110,20 +127,21 @@ def predict():
         prediction = do_prediction(data, model_id_)
         prediction["features"] = {k: v[0] for k,v in feats.items()}
         print(prediction)
-        return jsonify(prediction)
+        return prediction
 
     else:
-        print('train first')
-        return 'no model here'
+        raise HTTPException(status_code=400, detail="Train first.\n"
+                                                    "No model here.")
 
-@app.route('/addInstance', methods=['POST'])
-def addInstance():
-    json_cas = request.json
-    model_id = json_cas["modelId"]
-    base64_string = base64.b64decode(json_cas["cas"])
+
+@app.post("/addInstance")
+def addInstance(req: ClassificationInstance):
+    model_id = req.model_id
+    base64_string = base64.b64decode(req.cas)
 
     if not model_id: # todo: changed b/c there should always be a modelId
-        return 'No model id passed as argument. Please include a modelId', 400
+        raise HTTPException(status_code=400, detail="No model ID passed as argument."
+                                                    " Please include a model ID.")
 
     cas = load_cas_from_xmi(BytesIO(base64_string), typesystem=isaac_ts)
     feats = extraction.from_cases([cas])
@@ -139,20 +157,22 @@ def addInstance():
     return "Successfully added cas to model {}".format(model_id)
 
 
-@app.route('/trainFromCASes', methods=['GET'])
-def trainFromCASes():
-    model_id = request.args.get('modelId')
+@app.post('/trainFromCASes')
+def trainFromCASes(req: TrainFromCASRequest):
+    model_id = req.model_id
     if not model_id: # todo: changed b/c there should always be a modelId
         # model_id = model_default_name
-        return 'No model id passed as argument. Please include a modelId', 400
-    if features[model_id]:
+        raise HTTPException(status_code=400, detail="No model id passed as argument. "
+                                                    "Please include a modelId")
+    if features.get(model_id):
         print("type of features[model_id] in trainFromCASes: ", type(features[model_id]))
         data = pd.DataFrame.from_dict(features[model_id])
         print("type of data in trainFromCASes (after DataFrame.from_dict: ", type(data))
         return do_training(data, model_id)
     else:
-        print('add CAS instances first')
-        return 'No model here with id {}'.format(model_id) + '. Add CAS instances first.'
+        raise HTTPException(status_code=422, detail="No model here with id {}"
+                            .format(model_id) + ". Add CAS instances first.")
+
 
 def do_training(df: DataFrame, model_id: str = None) -> str:
     # using random forest as an example
@@ -198,14 +218,16 @@ def do_training(df: DataFrame, model_id: str = None) -> str:
     return return_message
 
 
-@app.route('/train', methods=['GET'])
+@app.get('/train')
 def train():
     print("Training")
+    # Fixme: When running the test on this function I get a depracation warning
+    #        for the function read_table. (read_csv is recommended)
     df = pd.read_table(training_data)
     return do_training(df, None)
 
 
-@app.route('/wipe', methods=['GET'])
+@app.get('/wipe')
 def wipe():
     try:
         shutil.rmtree(model_directory)
@@ -214,13 +236,5 @@ def wipe():
 
     except Exception as e:
         print(str(e))
-        return 'Could not remove and recreate the model directory'
-
-
-if __name__ == '__main__':
-    try:
-        port = int(sys.argv[1])
-    except Exception as e:
-        port = 80
-
-    app.run(host='0.0.0.0', port=port, debug=True)
+        raise HTTPException(status_code=400, detail="Could not remove and recreate the"
+                                                    " model directory")
