@@ -4,5 +4,6 @@ pandas==0.24.2
 scikit-learn==0.20.3
 dkpro-cassis==0.2.9
 pytest==5.4.3
+requests
 skl2onnx==1.7.0
 onnxruntime==1.4.0
