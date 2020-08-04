@@ -1,5 +1,6 @@
 import base64
 import json
+import os
 import pytest
 import main
 
@@ -24,6 +25,10 @@ def test_predict(client, xmi_bytes):
     instance_dict = {"model_id": "default", "cas": encoded_bytes.decode('ascii')}
     response = client.post("/predict", json=instance_dict)
 
+    # Wipe the onnx model that was created in the testing process.
+    model_path = "onnx_models/default.onnx"
+    if os.path.exists(model_path):
+        os.remove(model_path)
 
     assert response.status_code == 200
 

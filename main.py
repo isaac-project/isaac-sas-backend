@@ -2,8 +2,11 @@ import os
 import shutil
 import time
 import base64
+import numpy as np
+import onnxruntime as rt
 import pandas as pd
 from sklearn.externals import joblib
+
 
 from fastapi import FastAPI
 from fastapi import HTTPException
@@ -13,6 +16,8 @@ from cassis.xmi import load_cas_from_xmi
 from io import BytesIO
 from pandas.core.frame import DataFrame
 from pydantic import BaseModel
+from skl2onnx import convert_sklearn
+from skl2onnx.common.data_types import FloatTensorType
 from typing import Dict
 
 try:
@@ -33,6 +38,7 @@ dependent_variable = include[-1]
 
 model_directory = 'model'
 # model_file_name = '%s/model.pkl' % model_directory
+onnx_model_dir = 'onnx_models'
 
 model_default_name = "default"
 
@@ -48,6 +54,8 @@ lock = Lock()
 # These will be populated at training time
 model_columns = {}
 clf = {} # model objects
+# Model classes are used during prediction to correctly map classes to probabilities.
+model_classes = {}
 
 # load existing models
 try:
@@ -60,7 +68,19 @@ try:
             else:
                 model_id = f[:-4]
                 clf[model_id] = joblib.load('{}/{}.pkl'.format(model_directory, model_id))
+                model_classes[model_id] = clf[model_id].classes_
                 print('model {} loaded'.format(model_id))
+
+                # This block of code converts the sklearn model to an ONNX model.
+
+                # The number of features of the model is obtained from the n_features_ attribute.
+                # Fixme: Note that this works for the Random Forest Classifier in sklearn
+                #        but does not work for all other model types.
+                num_features = clf[model_id].n_features_
+                initial_type = [('float_input', FloatTensorType([None, num_features]))]
+                clf[model_id] = convert_sklearn(clf[model_id], initial_types=initial_type)
+                with open("{}/{}.onnx".format(onnx_model_dir, model_id), "wb") as f:
+                    f.write(clf[model_id].SerializeToString())
 
 except Exception as e:
     print('No model here')
@@ -92,10 +112,16 @@ def do_prediction(data: DataFrame, model_id: str = None) -> dict:
     # Thanks to @lorenzori
     query = query.reindex(columns=model_columns[model_id], fill_value=0)
 
+    # This block performs predictions with ONNX runtime.
+    session = rt.InferenceSession("{}/{}.onnx".format(onnx_model_dir, model_id))
+    input_name = session.get_inputs()[0].name
+    label_name = session.get_outputs()[0].name
+    pred = session.run([label_name], {input_name: query.to_numpy(dtype=np.float32)})[0]
+
     # get prediction as class probability distribution and map to classes
     probs = dict(zip(
-        map(str,clf[model_id].classes_),
-        map(float,clf[model_id].predict_proba(query)[0])))
+        map(str, model_classes[model_id]),
+        map(float, pred)))
 
     # prediction is the class with max probability
     return {"prediction":max(probs, key=lambda k: probs[k]), "classProbabilities":probs}
@@ -238,3 +264,15 @@ def wipe():
         print(str(e))
         raise HTTPException(status_code=400, detail="Could not remove and recreate the"
                                                     " model directory")
+
+@app.get('/wipeONNX')
+def wipe_onnx():
+    try:
+        shutil.rmtree(onnx_model_dir)
+        os.makedirs(onnx_model_dir)
+        return 'ONNX Models wiped'
+
+    except Exception as e:
+        print(str(e))
+        raise HTTPException(status_code=400, detail="Could not remove and recreate the"
+                                                    " onnx_models directory")
