@@ -12,7 +12,7 @@ from main import app
 def client():
     return TestClient(app)
 
-    
+
 @pytest.fixture()
 def xmi_bytes():
     with open("testdata/xmi/1ET5_7_0.xmi", "rb") as in_file:
@@ -22,7 +22,7 @@ def xmi_bytes():
 
 def test_predict(client, xmi_bytes):
     encoded_bytes = base64.b64encode(xmi_bytes)
-    instance_dict = {"model_id": "default", "cas": encoded_bytes.decode('ascii')}
+    instance_dict = {"model_id": "default", "cas": encoded_bytes.decode("ascii")}
     response = client.post("/predict", json=instance_dict)
 
     # Wipe the onnx model that was created in the testing process.
@@ -35,33 +35,20 @@ def test_predict(client, xmi_bytes):
 
 def test_predict_wrong_model_ID(client, xmi_bytes):
     encoded_bytes = base64.b64encode(xmi_bytes)
-    instance_dict = {"model_id": "non-existent", "cas": encoded_bytes.decode('ascii')}
+    instance_dict = {"model_id": "non-existent", "cas": encoded_bytes.decode("ascii")}
     response = client.post("/predict", json=instance_dict)
 
     assert response.status_code == 422
     assert (
-        json.loads(response.text)["detail"] == "Model with modelId \"non-existent\" has "
-        "not been trained yet. Please train first"
+        json.loads(response.text)["detail"]
+        == 'Model with model ID "non-existent" could '
+        "not be found in the ONNX model directory. Please train first."
     )
-
-
-def test_predict_no_model(client, xmi_bytes):
-    encoded_bytes = base64.b64encode(xmi_bytes)
-    # Pretend that main.clf is empty but store its value to put back in later.
-    temp_clf = main.clf
-    main.clf = {}
-    instance_dict = {"model_id": "", "cas": encoded_bytes.decode("ascii")}
-    response = client.post("/predict", json=instance_dict)
-    # Put the original values back into main.clf.
-    main.clf = temp_clf
-
-    assert response.status_code == 400
-    assert json.loads(response.text)["detail"] == "Train first.\nNo model here."
 
 
 def test_addInstance(client, xmi_bytes):
     encoded_bytes = base64.b64encode(xmi_bytes)
-    instance_dict = {"model_id": "default", "cas": encoded_bytes.decode('ascii')}
+    instance_dict = {"model_id": "default", "cas": encoded_bytes.decode("ascii")}
     response = client.post("/addInstance", json=instance_dict)
 
     assert response.status_code == 200
@@ -69,7 +56,7 @@ def test_addInstance(client, xmi_bytes):
 
 def test_addInstance_no_model_ID(client, xmi_bytes):
     encoded_bytes = base64.b64encode(xmi_bytes)
-    instance_dict = {"model_id": "", "cas": encoded_bytes.decode('ascii')}
+    instance_dict = {"model_id": "", "cas": encoded_bytes.decode("ascii")}
     response = client.post("/addInstance", json=instance_dict)
 
     assert response.status_code == 400

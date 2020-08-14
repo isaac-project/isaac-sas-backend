@@ -79,11 +79,9 @@ def do_prediction(data: DataFrame, model_id: str = None) -> dict:
     if model_id not in clf:
         clf[model_id] = load_onnx_model("{}/{}.onnx".format(onnx_model_dir, model_id))
 
-    query = pd.get_dummies(data)
-
-    # This block performs predictions with ONNX runtime.
     session = rt.InferenceSession("{}/{}.onnx".format(onnx_model_dir, model_id))
 
+    query = pd.get_dummies(data)
     # The columns in string format are retrieved from the model and converted
     # back to a list.
     model_columns = clf[model_id].metadata_props[1].value.split(" ")
@@ -93,6 +91,7 @@ def do_prediction(data: DataFrame, model_id: str = None) -> dict:
 
     input_name = session.get_inputs()[0].name
     label_name = session.get_outputs()[0].name
+    # Prediction takes place here.
     pred = session.run([label_name], {input_name: query.to_numpy(dtype=np.float32)})[0]
 
     # The model classes are retrieved
@@ -110,41 +109,34 @@ def do_prediction(data: DataFrame, model_id: str = None) -> dict:
 
 @app.post("/predict", response_model=CASPrediction)
 def predict(req: ClassificationInstance):
-    if clf:
-        # try: # todo: maybe uncomment and try running it again ?
-        model_id = req.model_id
-        base64_cas = base64.b64decode(req.cas)
+    model_id = req.model_id
+    base64_cas = base64.b64decode(req.cas)
 
-        # If no model ID is there, use the default model.
-        if not model_id:
-            model_id = model_default_name
+    # If no model ID is there, use the default model.
+    if not model_id:
+        model_id = model_default_name
 
-        # Check that the model is stored in a file.
-        if model_id not in [
-            model.rstrip(".onnx") for model in os.listdir(onnx_model_dir)
-        ]:
-            raise HTTPException(
-                status_code=422,
-                detail='Model with model ID "{}" could not be'
-                " found in the ONNX model directory.."
-                " Please train first".format(model_id),
-            )
+    # Check that the model is stored in a file.
+    if model_id not in [model.rstrip(".onnx") for model in os.listdir(onnx_model_dir)]:
+        raise HTTPException(
+            status_code=422,
+            detail='Model with model ID "{}" could not be'
+            " found in the ONNX model directory."
+            " Please train first.".format(model_id),
+        )
 
-        print("printing deseralized json cas modelID: ", model_id)
+    print("printing deseralized json cas modelID: ", model_id)
 
-        # from_cases feature extraction
-        cas = load_cas_from_xmi(BytesIO(base64_cas), typesystem=isaac_ts)
-        print("loaded the cas...")
-        feats = extraction.from_cases([cas])
-        print("extracted feats")
-        data = pd.DataFrame.from_dict(feats)
-        prediction = do_prediction(data, model_id)
-        prediction["features"] = {k: v[0] for k, v in feats.items()}
-        print(prediction)
-        return prediction
-
-    else:
-        raise HTTPException(status_code=400, detail="Train first.\n" "No model here.")
+    # from_cases feature extraction
+    cas = load_cas_from_xmi(BytesIO(base64_cas), typesystem=isaac_ts)
+    print("loaded the cas...")
+    feats = extraction.from_cases([cas])
+    print("extracted feats")
+    data = pd.DataFrame.from_dict(feats)
+    prediction = do_prediction(data, model_id)
+    prediction["features"] = {k: v[0] for k, v in feats.items()}
+    print(prediction)
+    return prediction
 
 
 @app.post("/addInstance")
@@ -268,8 +260,8 @@ def train():
     return do_training(df, None)
 
 
-@app.get("/wipeONNX")
-def wipe_onnx():
+@app.get("/wipe_models")
+def wipe_models():
     try:
         shutil.rmtree(onnx_model_dir)
         os.makedirs(onnx_model_dir)
@@ -279,5 +271,5 @@ def wipe_onnx():
         print(str(e))
         raise HTTPException(
             status_code=400,
-            detail="Could not remove and recreate the" " onnx_models directory",
+            detail="Could not remove and recreate the onnx_models directory",
         )
