@@ -5,8 +5,6 @@ import base64
 import numpy as np
 import onnxruntime as rt
 import pandas as pd
-from sklearn.externals import joblib
-
 
 from fastapi import FastAPI
 from fastapi import HTTPException
@@ -18,6 +16,7 @@ from pandas.core.frame import DataFrame
 from pydantic import BaseModel
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import FloatTensorType
+from skl2onnx.helpers.onnx_helper import load_onnx_model
 from typing import Dict
 
 try:
@@ -28,18 +27,24 @@ except:
 app = FastAPI()
 
 # inputs
-training_data = 'data/gold-standard-features.tsv'
-include = ['_InitialView-Keyword-Overlap', '_InitialView-Token-Overlap',
-           'studentAnswer-Token-Overlap', '_InitialView-Chunk-Overlap',
-           'studentAnswer-Chunk-Overlap', '_InitialView-Triple-Overlap',
-           'studentAnswer-Triple-Overlap', 'LC_TOKEN-Match', 'LEMMA-Match',
-           'SYNONYM-Match', 'Variety', 'Outcome']
+training_data = "data/gold-standard-features.tsv"
+include = [
+    "_InitialView-Keyword-Overlap",
+    "_InitialView-Token-Overlap",
+    "studentAnswer-Token-Overlap",
+    "_InitialView-Chunk-Overlap",
+    "studentAnswer-Chunk-Overlap",
+    "_InitialView-Triple-Overlap",
+    "studentAnswer-Triple-Overlap",
+    "LC_TOKEN-Match",
+    "LEMMA-Match",
+    "SYNONYM-Match",
+    "Variety",
+    "Outcome",
+]
 dependent_variable = include[-1]
 
-model_directory = 'model'
-# model_file_name = '%s/model.pkl' % model_directory
-onnx_model_dir = 'onnx_models'
-
+onnx_model_dir = "onnx_models"
 model_default_name = "default"
 
 # UIMA / features stuff
@@ -51,41 +56,7 @@ extraction = FeatureExtraction()
 features = {}
 lock = Lock()
 
-# These will be populated at training time
-model_columns = {}
-clf = {} # model objects
-# Model classes are used during prediction to correctly map classes to probabilities.
-model_classes = {}
-
-# load existing models
-try:
-    for f in os.listdir(model_directory):
-        if f.endswith(".pkl"):
-            if "_columns" in f:
-                model_id = f[:-12]
-                model_columns[model_id] = joblib.load('{}/{}_columns.pkl'.format(model_directory, model_id))
-                print('model columns {} loaded'.format(model_id))
-            else:
-                model_id = f[:-4]
-                clf[model_id] = joblib.load('{}/{}.pkl'.format(model_directory, model_id))
-                model_classes[model_id] = clf[model_id].classes_
-                print('model {} loaded'.format(model_id))
-
-                # This block of code converts the sklearn model to an ONNX model.
-
-                # The number of features of the model is obtained from the n_features_ attribute.
-                # Fixme: Note that this works for the Random Forest Classifier in sklearn
-                #        but does not work for all other model types.
-                num_features = clf[model_id].n_features_
-                initial_type = [('float_input', FloatTensorType([None, num_features]))]
-                clf[model_id] = convert_sklearn(clf[model_id], initial_types=initial_type)
-                with open("{}/{}.onnx".format(onnx_model_dir, model_id), "wb") as f:
-                    f.write(clf[model_id].SerializeToString())
-
-except Exception as e:
-    print('No model here')
-    print('Train first')
-    print(str(e))
+clf = {}  # model objects
 
 
 class ClassificationInstance(BaseModel):
@@ -104,45 +75,62 @@ class TrainFromCASRequest(BaseModel):
 
 
 def do_prediction(data: DataFrame, model_id: str = None) -> dict:
-    query = pd.get_dummies(data)
-    if not model_id:
-        model_id = model_default_name
+    # Check that the model object has been stored in clf. If not, store it.
+    if model_id not in clf:
+        clf[model_id] = load_onnx_model("{}/{}.onnx".format(onnx_model_dir, model_id))
 
-    # https://github.com/amirziai/sklearnflask/issues/3
-    # Thanks to @lorenzori
-    query = query.reindex(columns=model_columns[model_id], fill_value=0)
+    query = pd.get_dummies(data)
 
     # This block performs predictions with ONNX runtime.
     session = rt.InferenceSession("{}/{}.onnx".format(onnx_model_dir, model_id))
+
+    # The columns in string format are retrieved from the model and converted
+    # back to a list.
+    model_columns = clf[model_id].metadata_props[1].value.split(" ")
+    # https://github.com/amirziai/sklearnflask/issues/3
+    # Thanks to @lorenzori
+    query = query.reindex(columns=model_columns, fill_value=0)
+
     input_name = session.get_inputs()[0].name
     label_name = session.get_outputs()[0].name
     pred = session.run([label_name], {input_name: query.to_numpy(dtype=np.float32)})[0]
 
+    # The model classes are retrieved
+    output_classes = clf[model_id].metadata_props[0].value.split(" ")
+
     # get prediction as class probability distribution and map to classes
-    probs = dict(zip(
-        map(str, model_classes[model_id]),
-        map(float, pred)))
+    probs = dict(zip(map(str, output_classes), map(float, pred)))
 
     # prediction is the class with max probability
-    return {"prediction":max(probs, key=lambda k: probs[k]), "classProbabilities":probs}
+    return {
+        "prediction": max(probs, key=lambda k: probs[k]),
+        "classProbabilities": probs,
+    }
 
 
 @app.post("/predict", response_model=CASPrediction)
 def predict(req: ClassificationInstance):
     if clf:
-    #try: # todo: maybe uncomment and try running it again ?
-        model_id_ = req.model_id
+        # try: # todo: maybe uncomment and try running it again ?
+        model_id = req.model_id
         base64_cas = base64.b64decode(req.cas)
 
-        # TODO: maybe check if modelId is in models, if not, do not proceed? See if the error gets passed on to REST service
-        # I chose HTTP error 422 ("Unprocessable Entity") for this case.
-        # Maybe there is an error code that is more applicable but I didn't find.
-        if model_id_ not in clf:
-            raise HTTPException(status_code=422,
-                                detail="Model with modelId \"{}\" has not been trained yet."
-                                       " Please train first".format(model_id_))
+        # If no model ID is there, use the default model.
+        if not model_id:
+            model_id = model_default_name
 
-        print("printing deseralized json cas modelID: ", model_id_)
+        # Check that the model is stored in a file.
+        if model_id not in [
+            model.rstrip(".onnx") for model in os.listdir(onnx_model_dir)
+        ]:
+            raise HTTPException(
+                status_code=422,
+                detail='Model with model ID "{}" could not be'
+                " found in the ONNX model directory.."
+                " Please train first".format(model_id),
+            )
+
+        print("printing deseralized json cas modelID: ", model_id)
 
         # from_cases feature extraction
         cas = load_cas_from_xmi(BytesIO(base64_cas), typesystem=isaac_ts)
@@ -150,14 +138,13 @@ def predict(req: ClassificationInstance):
         feats = extraction.from_cases([cas])
         print("extracted feats")
         data = pd.DataFrame.from_dict(feats)
-        prediction = do_prediction(data, model_id_)
-        prediction["features"] = {k: v[0] for k,v in feats.items()}
+        prediction = do_prediction(data, model_id)
+        prediction["features"] = {k: v[0] for k, v in feats.items()}
         print(prediction)
         return prediction
 
     else:
-        raise HTTPException(status_code=400, detail="Train first.\n"
-                                                    "No model here.")
+        raise HTTPException(status_code=400, detail="Train first.\n" "No model here.")
 
 
 @app.post("/addInstance")
@@ -165,9 +152,11 @@ def addInstance(req: ClassificationInstance):
     model_id = req.model_id
     base64_string = base64.b64decode(req.cas)
 
-    if not model_id: # todo: changed b/c there should always be a modelId
-        raise HTTPException(status_code=400, detail="No model ID passed as argument."
-                                                    " Please include a model ID.")
+    if not model_id:  # todo: changed b/c there should always be a modelId
+        raise HTTPException(
+            status_code=400,
+            detail="No model ID passed as argument." " Please include a model ID.",
+        )
 
     cas = load_cas_from_xmi(BytesIO(base64_string), typesystem=isaac_ts)
     feats = extraction.from_cases([cas])
@@ -183,36 +172,46 @@ def addInstance(req: ClassificationInstance):
     return "Successfully added cas to model {}".format(model_id)
 
 
-@app.post('/trainFromCASes')
+@app.post("/trainFromCASes")
 def trainFromCASes(req: TrainFromCASRequest):
     model_id = req.model_id
-    if not model_id: # todo: changed b/c there should always be a modelId
+    if not model_id:  # todo: changed b/c there should always be a modelId
         # model_id = model_default_name
-        raise HTTPException(status_code=400, detail="No model id passed as argument. "
-                                                    "Please include a modelId")
+        raise HTTPException(
+            status_code=400,
+            detail="No model id passed as argument. " "Please include a modelId",
+        )
     if features.get(model_id):
-        print("type of features[model_id] in trainFromCASes: ", type(features[model_id]))
+        print(
+            "type of features[model_id] in trainFromCASes: ", type(features[model_id])
+        )
         data = pd.DataFrame.from_dict(features[model_id])
         print("type of data in trainFromCASes (after DataFrame.from_dict: ", type(data))
         return do_training(data, model_id)
     else:
-        raise HTTPException(status_code=422, detail="No model here with id {}"
-                            .format(model_id) + ". Add CAS instances first.")
+        raise HTTPException(
+            status_code=422,
+            detail="No model here with id {}".format(model_id)
+            + ". Add CAS instances first.",
+        )
 
 
 def do_training(df: DataFrame, model_id: str = None) -> str:
     # using random forest as an example
     # can do the training separately and just update the pickles
     from sklearn.ensemble import RandomForestClassifier as rf
+
     df_ = df[include]
 
     categoricals = []  # going to one-hot encode categorical variables
 
     for col, col_type in df_.dtypes.items():
-        if col_type == 'O':
+        if col_type == "O":
             categoricals.append(col)
         else:
-            df_[col].fillna(0, inplace=True)  # fill NA's with 0 for ints/floats, too generic
+            df_[col].fillna(
+                0, inplace=True
+            )  # fill NA's with 0 for ints/floats, too generic
 
     # get_dummies effectively creates one-hot encoded variables
     df_ohe = pd.get_dummies(df_, columns=categoricals, dummy_na=True)
@@ -222,29 +221,45 @@ def do_training(df: DataFrame, model_id: str = None) -> str:
     if not model_id:
         model_id = model_default_name
 
-    # capture a list of columns that will be used for prediction
-    model_columns_file_name = '{}/{}_columns.pkl'.format(model_directory, model_id)
-    with lock:
-        model_columns[model_id] = list(x.columns)
-    joblib.dump(model_columns[model_id], model_columns_file_name)
-
     # build classifier
     with lock:
         clf[model_id] = rf()
         start = time.time()
         clf[model_id].fit(x, y)
+        # Store the score, model columns and the output classes for later use.
+        model_score = clf[model_id].score(x, y)
+        output_classes = [str(out_class) for out_class in list(clf[model_id].classes_)]
+        model_columns = list(x.columns)
 
-    out_file = '{}/{}.pkl'.format(model_directory, model_id)
-    joblib.dump(clf[model_id], out_file)
+    # The number of features of the model is obtained from the n_features_ attribute.
+    # Fixme: Note that this works for the Random Forest Classifier in sklearn
+    #        but does not work for all other model types.
+    num_features = clf[model_id].n_features_
+    initial_type = [("float_input", FloatTensorType([None, num_features]))]
+    clf[model_id] = convert_sklearn(clf[model_id], initial_types=initial_type)
 
-    message1 = 'Trained in %.5f seconds' % (time.time() - start)
-    message2 = 'Model training score: %s' % clf[model_id].score(x, y)
-    return_message = 'Success. \n{0}. \n{1}.'.format(message1, message2)
-    print(return_message)
+    # Manually pass the output classes and model columns to the converted model
+    # using the metadata_props attribute.
+    for category, metadata in zip(
+        ("output_classes", "model_columns"), (output_classes, model_columns)
+    ):
+        new_meta = clf[model_id].metadata_props.add()
+        new_meta.key = category
+        # The metadata lists must be converted to a string because the
+        # metadata_props attribute only allows sending strings.
+        new_meta.value = " ".join(metadata)
+
+    with open("{}/{}.onnx".format(onnx_model_dir, model_id), "wb") as onnx_file:
+        onnx_file.write(clf[model_id].SerializeToString())
+
+    message1 = "Trained in %.5f seconds" % (time.time() - start)
+    message2 = "Model training score: %s" % model_score
+    return_message = "Success. \n{0}. \n{1}.".format(message1, message2)
+
     return return_message
 
 
-@app.get('/train')
+@app.get("/train")
 def train():
     print("Training")
     # Fixme: When running the test on this function I get a depracation warning
@@ -253,26 +268,16 @@ def train():
     return do_training(df, None)
 
 
-@app.get('/wipe')
-def wipe():
-    try:
-        shutil.rmtree(model_directory)
-        os.makedirs(model_directory)
-        return 'Models wiped'
-
-    except Exception as e:
-        print(str(e))
-        raise HTTPException(status_code=400, detail="Could not remove and recreate the"
-                                                    " model directory")
-
-@app.get('/wipeONNX')
+@app.get("/wipeONNX")
 def wipe_onnx():
     try:
         shutil.rmtree(onnx_model_dir)
         os.makedirs(onnx_model_dir)
-        return 'ONNX Models wiped'
+        return "ONNX Models wiped"
 
     except Exception as e:
         print(str(e))
-        raise HTTPException(status_code=400, detail="Could not remove and recreate the"
-                                                    " onnx_models directory")
+        raise HTTPException(
+            status_code=400,
+            detail="Could not remove and recreate the" " onnx_models directory",
+        )
