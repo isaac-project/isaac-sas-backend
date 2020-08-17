@@ -69,7 +69,7 @@ except Exception as e:
 
 
 class ClassificationInstance(BaseModel):
-    model_id: str
+    modelId: str
     cas: str
 
 
@@ -80,7 +80,7 @@ class CASPrediction(BaseModel):
 
 
 class TrainFromCASRequest(BaseModel):
-    model_id: str
+    modelId: str
 
 
 def do_prediction(data: DataFrame, model_id: str = None) -> dict:
@@ -105,7 +105,7 @@ def do_prediction(data: DataFrame, model_id: str = None) -> dict:
 def predict(req: ClassificationInstance):
     if clf:
     #try: # todo: maybe uncomment and try running it again ?
-        model_id_ = req.model_id
+        model_id_ = req.modelId
         base64_cas = base64.b64decode(req.cas)
 
         # TODO: maybe check if modelId is in models, if not, do not proceed? See if the error gets passed on to REST service
@@ -136,7 +136,7 @@ def predict(req: ClassificationInstance):
 
 @app.post("/addInstance")
 def addInstance(req: ClassificationInstance):
-    model_id = req.model_id
+    model_id = req.modelId
     base64_string = base64.b64decode(req.cas)
 
     if not model_id: # todo: changed b/c there should always be a modelId
@@ -159,7 +159,7 @@ def addInstance(req: ClassificationInstance):
 
 @app.post('/trainFromCASes')
 def trainFromCASes(req: TrainFromCASRequest):
-    model_id = req.model_id
+    model_id = req.modelId
     if not model_id: # todo: changed b/c there should always be a modelId
         # model_id = model_default_name
         raise HTTPException(status_code=400, detail="No model id passed as argument. "

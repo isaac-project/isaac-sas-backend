@@ -21,7 +21,7 @@ def xmi_bytes():
 
 def test_predict(client, xmi_bytes):
     encoded_bytes = base64.b64encode(xmi_bytes)
-    instance_dict = {"model_id": "default", "cas": encoded_bytes.decode('ascii')}
+    instance_dict = {"modelId": "default", "cas": encoded_bytes.decode('ascii')}
     response = client.post("/predict", json=instance_dict)
 
 
@@ -30,7 +30,7 @@ def test_predict(client, xmi_bytes):
 
 def test_predict_wrong_model_ID(client, xmi_bytes):
     encoded_bytes = base64.b64encode(xmi_bytes)
-    instance_dict = {"model_id": "non-existent", "cas": encoded_bytes.decode('ascii')}
+    instance_dict = {"modelId": "non-existent", "cas": encoded_bytes.decode('ascii')}
     response = client.post("/predict", json=instance_dict)
 
     assert response.status_code == 422
@@ -45,7 +45,7 @@ def test_predict_no_model(client, xmi_bytes):
     # Pretend that main.clf is empty but store its value to put back in later.
     temp_clf = main.clf
     main.clf = {}
-    instance_dict = {"model_id": "", "cas": encoded_bytes.decode("ascii")}
+    instance_dict = {"modelId": "", "cas": encoded_bytes.decode("ascii")}
     response = client.post("/predict", json=instance_dict)
     # Put the original values back into main.clf.
     main.clf = temp_clf
@@ -56,7 +56,7 @@ def test_predict_no_model(client, xmi_bytes):
 
 def test_addInstance(client, xmi_bytes):
     encoded_bytes = base64.b64encode(xmi_bytes)
-    instance_dict = {"model_id": "default", "cas": encoded_bytes.decode('ascii')}
+    instance_dict = {"modelId": "default", "cas": encoded_bytes.decode('ascii')}
     response = client.post("/addInstance", json=instance_dict)
 
     assert response.status_code == 200
@@ -64,7 +64,7 @@ def test_addInstance(client, xmi_bytes):
 
 def test_addInstance_no_model_ID(client, xmi_bytes):
     encoded_bytes = base64.b64encode(xmi_bytes)
-    instance_dict = {"model_id": "", "cas": encoded_bytes.decode('ascii')}
+    instance_dict = {"modelId": "", "cas": encoded_bytes.decode('ascii')}
     response = client.post("/addInstance", json=instance_dict)
 
     assert response.status_code == 400
@@ -76,14 +76,14 @@ def test_addInstance_no_model_ID(client, xmi_bytes):
 
 def test_train_from_CASes(client):
     # Todo: Add CAS instance here.
-    instance_dict = {"model_id": "default"}
+    instance_dict = {"modelId": "default"}
     response = client.post("/trainFromCASes", json=instance_dict)
 
     assert response.status_code == 200
 
 
 def test_train_from_CASes_missing_CAS_instance(client):
-    instance_dict = {"model_id": "default"}
+    instance_dict = {"modelId": "default"}
     # Pretend that main.features is empty but store its value to put back in later.
     temp_features = main.features
     main.features = {}
@@ -99,7 +99,7 @@ def test_train_from_CASes_missing_CAS_instance(client):
 
 
 def test_train_from_CASes_no_modelID(client):
-    instance_dict = {"model_id": ""}
+    instance_dict = {"modelId": ""}
     response = client.post("/trainFromCASes", json=instance_dict)
 
     assert response.status_code == 400
