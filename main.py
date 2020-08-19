@@ -16,7 +16,6 @@ from pandas.core.frame import DataFrame
 from pydantic import BaseModel
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import FloatTensorType
-from skl2onnx.helpers.onnx_helper import load_onnx_model
 from typing import Dict
 
 try:
@@ -56,8 +55,6 @@ extraction = FeatureExtraction()
 features = {}
 lock = Lock()
 
-# Model objects for information retrieval.
-clf = {}
 # Inference session object for predictions.
 inf_sessions = {}
 
@@ -65,8 +62,6 @@ inf_sessions = {}
 # quick access.
 for model_file in os.listdir(onnx_model_dir):
     model_id = model_file.rstrip(".onnx")
-    if model_id not in clf:
-        clf[model_id] = load_onnx_model(os.path.join(onnx_model_dir, model_file))
     if model_id not in inf_sessions:
         inf_sessions[model_id] = rt.InferenceSession(
             os.path.join(onnx_model_dir, model_file)
@@ -95,7 +90,9 @@ def do_prediction(data: DataFrame, model_id: str = None) -> dict:
     query = pd.get_dummies(data)
     # The columns in string format are retrieved from the model and converted
     # back to a list.
-    model_columns = clf[model_id].metadata_props[1].value.split(" ")
+    model_columns = (
+        session.get_modelmeta().custom_metadata_map["model_columns"].split(" ")
+    )
     # https://github.com/amirziai/sklearnflask/issues/3
     # Thanks to @lorenzori
     query = query.reindex(columns=model_columns, fill_value=0)
@@ -105,8 +102,10 @@ def do_prediction(data: DataFrame, model_id: str = None) -> dict:
     # Prediction takes place here.
     pred = session.run([label_name], {input_name: query.to_numpy(dtype=np.float32)})[0]
 
-    # The model classes are retrieved
-    output_classes = clf[model_id].metadata_props[0].value.split(" ")
+    # The model classes are retrieved from the model and converted back to a list.
+    output_classes = (
+        session.get_modelmeta().custom_metadata_map["output_classes"].split(" ")
+    )
 
     # get prediction as class probability distribution and map to classes
     probs = dict(zip(map(str, output_classes), map(float, pred)))
@@ -178,7 +177,7 @@ def addInstance(req: ClassificationInstance):
 @app.post("/trainFromCASes")
 def trainFromCASes(req: TrainFromCASRequest):
     model_id = req.modelId
-    if not model_id: # todo: changed b/c there should always be a modelId
+    if not model_id:  # todo: changed b/c there should always be a modelId
         # model_id = model_default_name
         raise HTTPException(
             status_code=400,
@@ -226,34 +225,34 @@ def do_training(df: DataFrame, model_id: str = None) -> str:
 
     # build classifier
     with lock:
-        clf[model_id] = rf()
+        clf = rf()
         start = time.time()
-        clf[model_id].fit(x, y)
+        clf.fit(x, y)
         # Store the score, model columns and the output classes for later use.
-        model_score = clf[model_id].score(x, y)
-        output_classes = [str(out_class) for out_class in list(clf[model_id].classes_)]
+        model_score = clf.score(x, y)
+        output_classes = [str(out_class) for out_class in list(clf.classes_)]
         model_columns = list(x.columns)
 
     # The number of features of the model is obtained from the n_features_ attribute.
     # Fixme: Note that this works for the Random Forest Classifier in sklearn
     #        but does not work for all other model types.
-    num_features = clf[model_id].n_features_
+    num_features = clf.n_features_
     initial_type = [("float_input", FloatTensorType([None, num_features]))]
-    clf[model_id] = convert_sklearn(clf[model_id], initial_types=initial_type)
+    clf_onnx = convert_sklearn(clf, initial_types=initial_type)
 
     # Manually pass the output classes and model columns to the converted model
     # using the metadata_props attribute.
     for category, metadata in zip(
         ("output_classes", "model_columns"), (output_classes, model_columns)
     ):
-        new_meta = clf[model_id].metadata_props.add()
+        new_meta = clf_onnx.metadata_props.add()
         new_meta.key = category
         # The metadata lists must be converted to a string because the
         # metadata_props attribute only allows sending strings.
         new_meta.value = " ".join(metadata)
 
     with open("{}/{}.onnx".format(onnx_model_dir, model_id), "wb") as onnx_file:
-        onnx_file.write(clf[model_id].SerializeToString())
+        onnx_file.write(clf_onnx.SerializeToString())
 
     # Store an inference session for this model to be used during prediction.
     inf_sessions[model_id] = rt.InferenceSession(
