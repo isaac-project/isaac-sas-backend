@@ -56,7 +56,21 @@ extraction = FeatureExtraction()
 features = {}
 lock = Lock()
 
-clf = {}  # model objects
+# Model objects for information retrieval.
+clf = {}
+# Inference session object for predictions.
+inf_sessions = {}
+
+# Store all model objects and inference session objects in memory for
+# quick access.
+for model_file in os.listdir(onnx_model_dir):
+    model_id = model_file.rstrip(".onnx")
+    if model_id not in clf:
+        clf[model_id] = load_onnx_model(os.path.join(onnx_model_dir, model_file))
+    if model_id not in inf_sessions:
+        inf_sessions[model_id] = rt.InferenceSession(
+            os.path.join(onnx_model_dir, model_file)
+        )
 
 
 class ClassificationInstance(BaseModel):
@@ -75,11 +89,8 @@ class TrainFromCASRequest(BaseModel):
 
 
 def do_prediction(data: DataFrame, model_id: str = None) -> dict:
-    # Check that the model object has been stored in clf. If not, store it.
-    if model_id not in clf:
-        clf[model_id] = load_onnx_model("{}/{}.onnx".format(onnx_model_dir, model_id))
 
-    session = rt.InferenceSession("{}/{}.onnx".format(onnx_model_dir, model_id))
+    session = inf_sessions[model_id]
 
     query = pd.get_dummies(data)
     # The columns in string format are retrieved from the model and converted
@@ -243,6 +254,11 @@ def do_training(df: DataFrame, model_id: str = None) -> str:
 
     with open("{}/{}.onnx".format(onnx_model_dir, model_id), "wb") as onnx_file:
         onnx_file.write(clf[model_id].SerializeToString())
+
+    # Store an inference session for this model to be used during prediction.
+    inf_sessions[model_id] = rt.InferenceSession(
+        "{}/{}.onnx".format(onnx_model_dir, model_id)
+    )
 
     message1 = "Trained in %.5f seconds" % (time.time() - start)
     message2 = "Model training score: %s" % model_score

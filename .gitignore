@@ -8,3 +8,5 @@ data-analysis/data/*
 data/xmi/
 .cache/
 /env
+.pycache
+*/.pycache
