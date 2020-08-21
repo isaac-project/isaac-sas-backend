@@ -98,17 +98,16 @@ def do_prediction(data: DataFrame, model_id: str = None) -> dict:
     query = query.reindex(columns=model_columns, fill_value=0)
 
     input_name = session.get_inputs()[0].name
-    label_name = session.get_outputs()[0].name
+    # The predict_proba function is used because get_outputs() is indexed at 1.
+    # If it is indexed at 0, the predict method is used.
+    label_name = session.get_outputs()[1].name
     # Prediction takes place here.
     pred = session.run([label_name], {input_name: query.to_numpy(dtype=np.float32)})[0]
 
-    # The model classes are retrieved from the model and converted back to a list.
-    output_classes = (
-        session.get_modelmeta().custom_metadata_map["output_classes"].split(" ")
-    )
-
-    # get prediction as class probability distribution and map to classes
-    probs = dict(zip(map(str, output_classes), map(float, pred)))
+    # The Prediction dictionary is stored in a list by ONNX so it can be
+    # retrieved by indexing.
+    probs = pred[0]
+    print(probs)
 
     # prediction is the class with max probability
     return {
@@ -240,16 +239,13 @@ def do_training(df: DataFrame, model_id: str = None) -> str:
     initial_type = [("float_input", FloatTensorType([None, num_features]))]
     clf_onnx = convert_sklearn(clf, initial_types=initial_type)
 
-    # Manually pass the output classes and model columns to the converted model
-    # using the metadata_props attribute.
-    for category, metadata in zip(
-        ("output_classes", "model_columns"), (output_classes, model_columns)
-    ):
-        new_meta = clf_onnx.metadata_props.add()
-        new_meta.key = category
-        # The metadata lists must be converted to a string because the
-        # metadata_props attribute only allows sending strings.
-        new_meta.value = " ".join(metadata)
+    # Manually pass the model columns to the converted model using the
+    # metadata_props attribute.
+    new_meta = clf_onnx.metadata_props.add()
+    new_meta.key = "model_columns"
+    # The metadata lists must be converted to a string because the
+    # metadata_props attribute only allows sending strings.
+    new_meta.value = " ".join(model_columns)
 
     with open("{}/{}.onnx".format(onnx_model_dir, model_id), "wb") as onnx_file:
         onnx_file.write(clf_onnx.SerializeToString())
