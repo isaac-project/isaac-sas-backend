@@ -68,23 +68,23 @@ for model_file in os.listdir(onnx_model_dir):
 
 
 class ClassificationInstance(BaseModel):
-    model_id: str
+    modelID: str
     cas: str
 
 
 class CASPrediction(BaseModel):
     prediction: int
-    class_probabilities: Dict[Union[str, int], float]
+    classProbabilities: Dict[Union[str, int], float]
     features: Dict[str, Union[float, int]]
 
 
 class TrainFromCASRequest(BaseModel):
-    model_id: str
+    modelID: str
 
 
 class TrainingInstance(BaseModel):
-    file_name: str
-    model_id: str
+    fileName: str
+    modelID: str
 
 
 def do_prediction(data: DataFrame, model_id: str = None) -> dict:
@@ -117,13 +117,13 @@ def do_prediction(data: DataFrame, model_id: str = None) -> dict:
     # prediction is the class with max probability
     return {
         "prediction": max(probs, key=lambda k: probs[k]),
-        "class_probabilities": probs,
+        "classProbabilities": probs,
     }
 
 
 @app.post("/predict", response_model=CASPrediction)
 def predict(req: ClassificationInstance):
-    model_id = req.model_id
+    model_id = req.modelID
     base64_cas = base64.b64decode(req.cas)
 
     # Check that the model is stored in a file.
@@ -151,7 +151,7 @@ def predict(req: ClassificationInstance):
 
 @app.post("/addInstance")
 def addInstance(req: ClassificationInstance):
-    model_id = req.model_id
+    model_id = req.modelID
     base64_string = base64.b64decode(req.cas)
 
     if not model_id:
@@ -177,7 +177,7 @@ def addInstance(req: ClassificationInstance):
 @app.post("/trainFromCASes")
 def trainFromCASes(req: TrainFromCASRequest):
 
-    model_id = req.model_id
+    model_id = req.modelID
 
     if not model_id:
         raise HTTPException(
@@ -262,15 +262,18 @@ def do_training(df: DataFrame, model_id: str = None) -> str:
 
 @app.post("/train")
 def train(req: TrainingInstance):
+    model_id = req.modelID
+    file_name = req.fileName
+
     print("Training")
-    if not req.model_id:
+    if not model_id:
         raise HTTPException(
             status_code=400,
             detail="No model id passed as argument. " "Please include a model ID",
         )
 
-    df = pd.read_csv(req.file_name, delimiter="\t")
-    return do_training(df, req.model_id)
+    df = pd.read_csv(file_name, delimiter="\t")
+    return do_training(df, model_id)
 
 
 @app.get("/wipe_models")
