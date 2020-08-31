@@ -35,7 +35,7 @@ def test_predict(client, xmi_bytes):
     :param xmi_bytes: A byte-encoded CAS instance.
     """
     encoded_bytes = base64.b64encode(xmi_bytes)
-    instance_dict = {"modelID": "default", "cas": encoded_bytes.decode("ascii")}
+    instance_dict = {"modelId": "default", "cas": encoded_bytes.decode("ascii")}
     response = client.post("/predict", json=instance_dict)
 
     assert response.status_code == 200
@@ -59,7 +59,7 @@ def test_predict_wrong_model_ID(client, xmi_bytes):
     :param xmi_bytes: A byte-encoded CAS instance.
     """
     encoded_bytes = base64.b64encode(xmi_bytes)
-    instance_dict = {"modelID": "non-existent", "cas": encoded_bytes.decode("ascii")}
+    instance_dict = {"modelId": "non-existent", "cas": encoded_bytes.decode("ascii")}
     response = client.post("/predict", json=instance_dict)
 
     assert response.status_code == 422
@@ -78,7 +78,7 @@ def test_addInstance(client, xmi_bytes):
     :param xmi_bytes: A byte-encoded CAS instance.
     """
     encoded_bytes = base64.b64encode(xmi_bytes)
-    instance_dict = {"modelID": "default", "cas": encoded_bytes.decode("ascii")}
+    instance_dict = {"modelId": "default", "cas": encoded_bytes.decode("ascii")}
     response = client.post("/addInstance", json=instance_dict)
 
     added_to_features = "default" in main.features
@@ -98,7 +98,7 @@ def test_addInstance_no_model_ID(client, xmi_bytes):
     :param xmi_bytes: A byte-encoded CAS instance.
     """
     encoded_bytes = base64.b64encode(xmi_bytes)
-    instance_dict = {"modelID": "", "cas": encoded_bytes.decode("ascii")}
+    instance_dict = {"modelId": "", "cas": encoded_bytes.decode("ascii")}
     response = client.post("/addInstance", json=instance_dict)
 
     assert response.status_code == 400
@@ -122,13 +122,13 @@ def test_train_from_CASes(client, xmi_bytes):
     # This is not optimal because this makes this test depend on this endpoint
     # but this is the most natural way to populate the features dictionary.
     encoded_bytes = base64.b64encode(xmi_bytes)
-    instance_dict = {"modelID": "default_cas_test", "cas": encoded_bytes.decode("ascii")}
+    instance_dict = {"modelId": "default_cas_test", "cas": encoded_bytes.decode("ascii")}
     client.post("/addInstance", json=instance_dict)
     # Check that main.features has actually been populated.
     assert "default_cas_test" in main.features
 
     # The actual test of the endpoint happens here.
-    instance_dict = {"modelID": "default_cas_test"}
+    instance_dict = {"modelId": "default_cas_test"}
     response = client.post("/trainFromCASes", json=instance_dict)
 
     # Store states to check whether the file and session object were created.
@@ -154,7 +154,7 @@ def test_train_from_CASes_missing_CAS_instance(client):
 
     :param client: A client for testing.
     """
-    instance_dict = {"modelID": "default"}
+    instance_dict = {"modelId": "default"}
     # Pretend that main.features is empty but store its value to put back in later.
     temp_features = main.features
     main.features = {}
@@ -175,7 +175,7 @@ def test_train_from_CASes_no_modelID(client):
 
     :param client: A client for testing.
     """
-    instance_dict = {"modelID": ""}
+    instance_dict = {"modelId": ""}
     response = client.post("/trainFromCASes", json=instance_dict)
 
     assert response.status_code == 400
@@ -199,7 +199,7 @@ def test_train(client):
 
     instance_dict = {
         "fileName": os.path.join(main.onnx_model_dir, "random_train_data.tsv"),
-        "modelID": "random_data",
+        "modelId": "random_data",
     }
     response = client.post("/train", json=instance_dict)
 

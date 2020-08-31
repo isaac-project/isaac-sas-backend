@@ -68,7 +68,7 @@ for model_file in os.listdir(onnx_model_dir):
 
 
 class ClassificationInstance(BaseModel):
-    modelID: str
+    modelId: str
     cas: str
 
 
@@ -79,12 +79,12 @@ class CASPrediction(BaseModel):
 
 
 class TrainFromCASRequest(BaseModel):
-    modelID: str
+    modelId: str
 
 
 class TrainingInstance(BaseModel):
     fileName: str
-    modelID: str
+    modelId: str
 
 
 def do_prediction(data: DataFrame, model_id: str = None) -> dict:
@@ -123,7 +123,7 @@ def do_prediction(data: DataFrame, model_id: str = None) -> dict:
 
 @app.post("/predict", response_model=CASPrediction)
 def predict(req: ClassificationInstance):
-    model_id = req.modelID
+    model_id = req.modelId
     base64_cas = base64.b64decode(req.cas)
 
     # Check that the model is stored in a file.
@@ -151,7 +151,7 @@ def predict(req: ClassificationInstance):
 
 @app.post("/addInstance")
 def addInstance(req: ClassificationInstance):
-    model_id = req.modelID
+    model_id = req.modelId
     base64_string = base64.b64decode(req.cas)
 
     if not model_id:
@@ -177,7 +177,7 @@ def addInstance(req: ClassificationInstance):
 @app.post("/trainFromCASes")
 def trainFromCASes(req: TrainFromCASRequest):
 
-    model_id = req.modelID
+    model_id = req.modelId
 
     if not model_id:
         raise HTTPException(
@@ -262,7 +262,7 @@ def do_training(df: DataFrame, model_id: str = None) -> str:
 
 @app.post("/train")
 def train(req: TrainingInstance):
-    model_id = req.modelID
+    model_id = req.modelId
     file_name = req.fileName
 
     print("Training")
