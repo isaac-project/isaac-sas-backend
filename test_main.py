@@ -1,5 +1,6 @@
 import base64
 import json
+import os
 import pytest
 import main
 
@@ -20,16 +21,45 @@ def xmi_bytes():
 
 
 def test_predict(client, xmi_bytes):
+    """
+    Test the /addInstance endpoint with an example model.
+
+    This test predicts from the default model that sits in the actual onnx
+    model directory instead of from a model sitting in the testdata directory.
+    That is necessary because the models are loaded from this directory
+    to memory while the service is running.
+    The default model cannot be taken out of onnx_models directory.
+    Otherwise this test will not run anymore.
+
+    :param client: A client for testing.
+    :param xmi_bytes: A byte-encoded CAS instance.
+    """
     encoded_bytes = base64.b64encode(xmi_bytes)
-    instance_dict = {"modelId": "default", "cas": encoded_bytes.decode("ascii")}
+    instance_dict = {"model_id": "default", "cas": encoded_bytes.decode("ascii")}
     response = client.post("/predict", json=instance_dict)
 
     assert response.status_code == 200
 
+    # Assert that all values are between 0 and 1.
+    assert 0 <= response.json()["prediction"] <= 1
+
+    for cls in response.json()["class_probabilities"]:
+        assert 0 <= response.json()["class_probabilities"][cls] <= 1
+
+    for cls in response.json()["features"]:
+        assert 0 <= response.json()["features"][cls] <= 1
+
 
 def test_predict_wrong_model_ID(client, xmi_bytes):
+    """
+    Test the /predict endpoint with a model ID that is not present in the
+    session object dictionary.
+
+    :param client: A client for testing.
+    :param xmi_bytes: A byte-encoded CAS instance.
+    """
     encoded_bytes = base64.b64encode(xmi_bytes)
-    instance_dict = {"modelId": "non-existent", "cas": encoded_bytes.decode("ascii")}
+    instance_dict = {"model_id": "non-existent", "cas": encoded_bytes.decode("ascii")}
     response = client.post("/predict", json=instance_dict)
 
     assert response.status_code == 422
@@ -41,16 +71,34 @@ def test_predict_wrong_model_ID(client, xmi_bytes):
 
 
 def test_addInstance(client, xmi_bytes):
+    """
+    Test the /addInstance endpoint with an example instance.
+
+    :param client: A client for testing.
+    :param xmi_bytes: A byte-encoded CAS instance.
+    """
     encoded_bytes = base64.b64encode(xmi_bytes)
-    instance_dict = {"modelId": "default", "cas": encoded_bytes.decode("ascii")}
+    instance_dict = {"model_id": "default", "cas": encoded_bytes.decode("ascii")}
     response = client.post("/addInstance", json=instance_dict)
 
+    added_to_features = "default" in main.features
+
+    # Clean the main.features dictionary for future tests.
+    main.features = {}
+
+    assert added_to_features
     assert response.status_code == 200
 
 
 def test_addInstance_no_model_ID(client, xmi_bytes):
+    """
+    Test the /addInstance endpoint with missing model ID.
+
+    :param client: A client for testing.
+    :param xmi_bytes: A byte-encoded CAS instance.
+    """
     encoded_bytes = base64.b64encode(xmi_bytes)
-    instance_dict = {"modelId": "", "cas": encoded_bytes.decode("ascii")}
+    instance_dict = {"model_id": "", "cas": encoded_bytes.decode("ascii")}
     response = client.post("/addInstance", json=instance_dict)
 
     assert response.status_code == 400
@@ -60,18 +108,53 @@ def test_addInstance_no_model_ID(client, xmi_bytes):
     )
 
 
-# Todo:If the CAS string model is run, it changes the default model so that
-#      Only one output class is returned. Therefore, this test cannot be run.
-# def test_train_from_CASes(client):
-#     # Todo: Add CAS instance here.
-#     instance_dict = {"modelId": "default"}
-#     response = client.post("/trainFromCASes", json=instance_dict)
-#
-#     assert response.status_code == 200
+def test_train_from_CASes(client, xmi_bytes):
+    """
+    Test the /train_from_CASes endpoint with test data.
+
+    :param client: A client for testing.
+    :param xmi_bytes: A byte-encoded CAS instance.
+    """
+    # Change the onnx model directory for testing purposes.
+    main.onnx_model_dir = "testdata/test_onnx_models"
+
+    # I am using the addInstance endpoint here to create a CAS instance.
+    # This is not optimal because this makes this test depend on this endpoint
+    # but this is the most natural way to populate the features dictionary.
+    encoded_bytes = base64.b64encode(xmi_bytes)
+    instance_dict = {"model_id": "default_cas_test", "cas": encoded_bytes.decode("ascii")}
+    client.post("/addInstance", json=instance_dict)
+    # Check that main.features has actually been populated.
+    assert "default_cas_test" in main.features
+
+    # The actual test of the endpoint happens here.
+    instance_dict = {"model_id": "default_cas_test"}
+    response = client.post("/trainFromCASes", json=instance_dict)
+
+    # Store states to check whether the file and session object were created.
+    path_exists = os.path.exists(os.path.join(main.onnx_model_dir, "default_cas_test.onnx"))
+    session_stored = "default_cas_test" in main.inf_sessions
+
+    # Change onnx model directory back and delete test file and inference
+    # session object.
+    if session_stored:
+        del main.inf_sessions["default_cas_test"]
+    if path_exists:
+        os.remove(os.path.join(main.onnx_model_dir, "default_cas_test.onnx"))
+    main.onnx_model_dir = "onnx_models"
+
+    assert response.status_code == 200
+    assert path_exists
+    assert session_stored
 
 
 def test_train_from_CASes_missing_CAS_instance(client):
-    instance_dict = {"modelId": "default"}
+    """
+    Test the /train_from_CASes endpoint with missing CAS instance.
+
+    :param client: A client for testing.
+    """
+    instance_dict = {"model_id": "default"}
     # Pretend that main.features is empty but store its value to put back in later.
     temp_features = main.features
     main.features = {}
@@ -87,24 +170,53 @@ def test_train_from_CASes_missing_CAS_instance(client):
 
 
 def test_train_from_CASes_no_modelID(client):
-    instance_dict = {"modelId": ""}
+    """
+    Test the /train_from_CASes endpoint with missing model ID.
+
+    :param client: A client for testing.
+    """
+    instance_dict = {"model_id": ""}
     response = client.post("/trainFromCASes", json=instance_dict)
 
     assert response.status_code == 400
     assert (
         json.loads(response.text)["detail"] == "No model id passed as"
-        " argument. Please include a modelId"
+        " argument. Please include a model ID"
     )
 
 
-@pytest.mark.skip(reason="depracated function call: pandas.read_table")
 def test_train(client):
-    # Todo: This test is not complete yet.
-    response = client.get("/train")
+    """
+    Test the /train endpoint.
 
+    The test makes use of a randomly generated dataset.
+    This way no real dataset must be revealed to git.
+
+    :param client: A client for testing.
+    """
+    # Change the onnx model directory for testing purposes.
+    main.onnx_model_dir = "testdata/train_data"
+
+    instance_dict = {
+        "file_name": os.path.join(main.onnx_model_dir, "random_train_data.tsv"),
+        "model_id": "random_data",
+    }
+    response = client.post("/train", json=instance_dict)
+
+    # Store states to check whether the file and session object were created.
+    path_exists = os.path.exists(os.path.join(main.onnx_model_dir, "random_data.onnx"))
+    session_stored = "random_data" in main.inf_sessions
+
+    # Change onnx model directory back and delete test file and inference
+    # session object.
+    if session_stored:
+        del main.inf_sessions["random_data"]
+    if path_exists:
+        os.remove(os.path.join(main.onnx_model_dir, "random_data.onnx"))
+    main.onnx_model_dir = "onnx_models"
+
+    # The assertions are made after the clean-up process on the basis of the
+    # stored states. This ensures that cleaning is done in any case.
     assert response.status_code == 200
-
-
-# Todo: I haven't written a test for /wipe because it would cause models to be
-#       removed everytime the tests are run. If a test is desired, I can
-#       maybe find a workaround.
+    assert path_exists
+    assert session_stored

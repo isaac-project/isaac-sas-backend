@@ -17,6 +17,7 @@ from pydantic import BaseModel
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import FloatTensorType
 from typing import Dict
+from typing import Union
 
 try:
     from _thread import allocate_lock as Lock
@@ -26,7 +27,6 @@ except:
 app = FastAPI()
 
 # inputs
-training_data = "data/gold-standard-features.tsv"
 include = [
     "_InitialView-Keyword-Overlap",
     "_InitialView-Token-Overlap",
@@ -44,7 +44,6 @@ include = [
 dependent_variable = include[-1]
 
 onnx_model_dir = "onnx_models"
-model_default_name = "default"
 
 # UIMA / features stuff
 # type system
@@ -69,18 +68,23 @@ for model_file in os.listdir(onnx_model_dir):
 
 
 class ClassificationInstance(BaseModel):
-    modelId: str
+    model_id: str
     cas: str
 
 
 class CASPrediction(BaseModel):
-    prediction: str
-    classProbabilities: Dict[str, float]
-    features: Dict
+    prediction: int
+    class_probabilities: Dict[Union[str, int], float]
+    features: Dict[str, Union[float, int]]
 
 
 class TrainFromCASRequest(BaseModel):
-    modelId: str
+    model_id: str
+
+
+class TrainingInstance(BaseModel):
+    file_name: str
+    model_id: str
 
 
 def do_prediction(data: DataFrame, model_id: str = None) -> dict:
@@ -93,6 +97,7 @@ def do_prediction(data: DataFrame, model_id: str = None) -> dict:
     model_columns = (
         session.get_modelmeta().custom_metadata_map["model_columns"].split(" ")
     )
+
     # https://github.com/amirziai/sklearnflask/issues/3
     # Thanks to @lorenzori
     query = query.reindex(columns=model_columns, fill_value=0)
@@ -112,18 +117,14 @@ def do_prediction(data: DataFrame, model_id: str = None) -> dict:
     # prediction is the class with max probability
     return {
         "prediction": max(probs, key=lambda k: probs[k]),
-        "classProbabilities": probs,
+        "class_probabilities": probs,
     }
 
 
 @app.post("/predict", response_model=CASPrediction)
 def predict(req: ClassificationInstance):
-    model_id = req.modelId
+    model_id = req.model_id
     base64_cas = base64.b64decode(req.cas)
-
-    # If no model ID is there, use the default model.
-    if not model_id:
-        model_id = model_default_name
 
     # Check that the model is stored in a file.
     if model_id not in [model.rstrip(".onnx") for model in os.listdir(onnx_model_dir)]:
@@ -150,10 +151,10 @@ def predict(req: ClassificationInstance):
 
 @app.post("/addInstance")
 def addInstance(req: ClassificationInstance):
-    model_id = req.modelId
+    model_id = req.model_id
     base64_string = base64.b64decode(req.cas)
 
-    if not model_id:  # todo: changed b/c there should always be a modelId
+    if not model_id:
         raise HTTPException(
             status_code=400,
             detail="No model ID passed as argument." " Please include a model ID.",
@@ -175,13 +176,15 @@ def addInstance(req: ClassificationInstance):
 
 @app.post("/trainFromCASes")
 def trainFromCASes(req: TrainFromCASRequest):
-    model_id = req.modelId
-    if not model_id:  # todo: changed b/c there should always be a modelId
-        # model_id = model_default_name
+
+    model_id = req.model_id
+
+    if not model_id:
         raise HTTPException(
             status_code=400,
-            detail="No model id passed as argument. " "Please include a modelId",
+            detail="No model id passed as argument. " "Please include a model ID",
         )
+
     if features.get(model_id):
         print(
             "type of features[model_id] in trainFromCASes: ", type(features[model_id])
@@ -203,7 +206,6 @@ def do_training(df: DataFrame, model_id: str = None) -> str:
     from sklearn.ensemble import RandomForestClassifier as rf
 
     df_ = df[include]
-
     categoricals = []  # going to one-hot encode categorical variables
 
     for col, col_type in df_.dtypes.items():
@@ -219,9 +221,6 @@ def do_training(df: DataFrame, model_id: str = None) -> str:
     x = df_ohe[df_ohe.columns.difference([dependent_variable])]
     y = df_ohe[dependent_variable]
 
-    if not model_id:
-        model_id = model_default_name
-
     # build classifier
     with lock:
         clf = rf()
@@ -229,7 +228,6 @@ def do_training(df: DataFrame, model_id: str = None) -> str:
         clf.fit(x, y)
         # Store the score, model columns and the output classes for later use.
         model_score = clf.score(x, y)
-        output_classes = [str(out_class) for out_class in list(clf.classes_)]
         model_columns = list(x.columns)
 
     # The number of features of the model is obtained from the n_features_ attribute.
@@ -262,13 +260,17 @@ def do_training(df: DataFrame, model_id: str = None) -> str:
     return return_message
 
 
-@app.get("/train")
-def train():
+@app.post("/train")
+def train(req: TrainingInstance):
     print("Training")
-    # Fixme: When running the test on this function I get a depracation warning
-    #        for the function read_table. (read_csv is recommended)
-    df = pd.read_table(training_data)
-    return do_training(df, None)
+    if not req.model_id:
+        raise HTTPException(
+            status_code=400,
+            detail="No model id passed as argument. " "Please include a model ID",
+        )
+
+    df = pd.read_csv(req.file_name, delimiter="\t")
+    return do_training(df, req.model_id)
 
 
 @app.get("/wipe_models")
