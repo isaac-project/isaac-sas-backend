@@ -116,7 +116,7 @@ def test_train_from_CASes(client, xmi_bytes):
     :param xmi_bytes: A byte-encoded CAS instance.
     """
     # Change the onnx model directory for testing purposes.
-    main.onnx_model_dir = "testdata/test_onnx_models"
+    main.onnx_model_dir = "testdata"
 
     # I am using the addInstance endpoint here to create a CAS instance.
     # This is not optimal because this makes this test depend on this endpoint
