@@ -17,6 +17,7 @@ from pydantic import BaseModel
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import FloatTensorType
 from typing import Dict
+from typing import List
 from typing import Union
 
 try:
@@ -26,8 +27,10 @@ except:
 
 app = FastAPI()
 
-# inputs
-include = [
+
+# These are the standard input features for the two endpoints 
+# /train and /trainFromCASes.
+include_norm = [
     "_InitialView-Keyword-Overlap",
     "_InitialView-Token-Overlap",
     "studentAnswer-Token-Overlap",
@@ -41,7 +44,7 @@ include = [
     "Variety",
     "Outcome",
 ]
-dependent_variable = include[-1]
+dependent_variable = include_norm[-1]
 
 onnx_model_dir = "onnx_models"
 
@@ -84,6 +87,21 @@ class TrainFromCASRequest(BaseModel):
 
 class TrainingInstance(BaseModel):
     fileName: str
+    modelId: str
+
+
+class ShortAnswerInstance(BaseModel):
+    taskId: str
+    itemId: str
+    itemPrompt: str
+    itemTargets: List[str]
+    learnerId: str
+    answer: str
+
+
+class TrainFromLanguageDataRequest(BaseModel):
+    # The instance dictionaries must be in ShortAnswerInstance format.
+    instances: List[Dict]
     modelId: str
 
 
@@ -191,6 +209,7 @@ def trainFromCASes(req: TrainFromCASRequest):
         )
         data = pd.DataFrame.from_dict(features[model_id])
         print("type of data in trainFromCASes (after DataFrame.from_dict: ", type(data))
+
         return do_training(data, model_id)
     else:
         raise HTTPException(
@@ -200,7 +219,51 @@ def trainFromCASes(req: TrainFromCASRequest):
         )
 
 
-def do_training(df: DataFrame, model_id: str = None) -> str:
+@app.post("/trainFromAnswers")
+def trainFromAnswers(req: TrainFromLanguageDataRequest):
+    model_id = req.modelId
+    # The instance dictionaries are converted to ShortAnswerInstance objects.
+    instances = [ShortAnswerInstance(**instance) for instance in req.instances]
+
+    df = extract_features(instances)
+    include = list(df.columns)
+
+    return do_training(df, model_id, include=include, dependent_variable=include[-1])
+
+
+def extract_features(instances: List[ShortAnswerInstance]) -> DataFrame:
+
+    # This is a dummy feature setup, which will be replaced by the real
+    # one later.
+    features = []
+
+    # The import should be removed once the dummy is removed.
+    from random import randint
+
+    for instance in instances:
+        item_eq_answer = []
+        if any(target == instance.answer for target in instance.itemTargets):
+            item_eq_answer.append(1)
+        else:
+            item_eq_answer.append(0)
+
+        # Also create dummy values for the outcome variable.
+        item_eq_answer.append(randint(0, 1))
+
+        features.append(item_eq_answer)
+
+    columns = ["item_eq_answer", "outcome"]
+    # Dummy setup ends here, all this code needs to be replaced.
+
+    return pd.DataFrame(features, columns=columns)
+
+
+def do_training(
+    df: DataFrame,
+    model_id: str = None,
+    include: List[str] = include_norm,
+    dependent_variable: str = dependent_variable,
+) -> str:
     # using random forest as an example
     # can do the training separately and just update the pickles
     from sklearn.ensemble import RandomForestClassifier as rf
