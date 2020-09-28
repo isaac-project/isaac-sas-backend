@@ -28,7 +28,7 @@ except:
 app = FastAPI()
 
 
-# These are the standard input features for the two endpoints 
+# These are the standard input features for the two endpoints
 # /train and /trainFromCASes.
 include_norm = [
     "_InitialView-Keyword-Overlap",
@@ -100,8 +100,7 @@ class ShortAnswerInstance(BaseModel):
 
 
 class TrainFromLanguageDataRequest(BaseModel):
-    # The instance dictionaries must be in ShortAnswerInstance format.
-    instances: List[Dict]
+    instances: List[ShortAnswerInstance]
     modelId: str
 
 
@@ -222,10 +221,8 @@ def trainFromCASes(req: TrainFromCASRequest):
 @app.post("/trainFromAnswers")
 def trainFromAnswers(req: TrainFromLanguageDataRequest):
     model_id = req.modelId
-    # The instance dictionaries are converted to ShortAnswerInstance objects.
-    instances = [ShortAnswerInstance(**instance) for instance in req.instances]
 
-    df = extract_features(instances)
+    df = extract_features(req.instances)
     include = list(df.columns)
 
     return do_training(df, model_id, include=include, dependent_variable=include[-1])
