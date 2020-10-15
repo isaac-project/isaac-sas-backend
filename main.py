@@ -5,6 +5,7 @@ import base64
 import numpy as np
 import onnxruntime as rt
 import pandas as pd
+import math
 
 from fastapi import FastAPI
 from fastapi import HTTPException
@@ -161,7 +162,8 @@ def predict(req: ClassificationInstance):
     print("extracted feats")
     data = pd.DataFrame.from_dict(feats)
     prediction = do_prediction(data, model_id)
-    prediction["features"] = {k: v[0] for k, v in feats.items()}
+    nan_to_none = lambda f: None if math.isnan(f) else f
+    prediction["features"] = {k: nan_to_none(v[0]) for k, v in feats.items()}
     print(prediction)
     return prediction
 
