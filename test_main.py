@@ -29,7 +29,7 @@ def mock_instances():
         "itemTargets": ["one", "two", "three"],
         "learnerId": "0",
         "answer": "two",
-        "label": "0"
+        "label": "outcome"
     }
     instance2 = {
         "taskId": "1",
@@ -38,7 +38,7 @@ def mock_instances():
         "itemTargets": ["four", "five", "six"],
         "learnerId": "1",
         "answer": "two",
-        "label": "0"
+        "label": "outcome"
     }
     instance3 = {
         "taskId": "2",
@@ -47,7 +47,7 @@ def mock_instances():
         "itemTargets": ["four", "five", "six"],
         "learnerId": "2",
         "answer": "five",
-        "label": "1"
+        "label": "outcome"
     }
 
     # The dicionaries are used to set up ShortAnswerInstance objects.

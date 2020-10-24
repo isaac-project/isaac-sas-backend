@@ -228,14 +228,14 @@ def trainFromAnswers(req: TrainFromLanguageDataRequest):
     # for ft_extractor in ft_extractors:
     #     df = pd.concat([df, ft_extractor.extract(req.instances)], axis=1)
 
-    include = list(df.columns)
     # Todo: Here the dependent variable is just the label of the first ShortAnswerInstance
     #       object. This is just temporary and must be changed for real implementation.
     dependent_variable = req.instances[0].label
 
-    # do_training does not accept an empty dataframe so this one serves as a dummy.
+    # Fixme: do_training does not accept an empty dataframe so this one serves as a dummy.
     # Todo: This line must be removed once real implementations exist.
-    df = pd.DataFrame([[1, 0], [1, 1], [0, 0]], columns=["item_eq_answer", "outcome"])
+    df = pd.DataFrame([[1, 0], [1, 1], [0, 0]], columns=["item_eq_answer", dependent_variable])
+    include = list(df.columns)
 
     return do_training(df, model_id, include=include, dependent_variable=dependent_variable)
 
