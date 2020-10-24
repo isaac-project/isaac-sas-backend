@@ -6,7 +6,6 @@ import main
 
 from fastapi.testclient import TestClient
 from main import app
-from main import extract_features
 
 
 @pytest.fixture()
@@ -30,6 +29,7 @@ def mock_instances():
         "itemTargets": ["one", "two", "three"],
         "learnerId": "0",
         "answer": "two",
+        "label": "0"
     }
     instance2 = {
         "taskId": "1",
@@ -38,6 +38,7 @@ def mock_instances():
         "itemTargets": ["four", "five", "six"],
         "learnerId": "1",
         "answer": "two",
+        "label": "0"
     }
     instance3 = {
         "taskId": "2",
@@ -46,9 +47,10 @@ def mock_instances():
         "itemTargets": ["four", "five", "six"],
         "learnerId": "2",
         "answer": "five",
+        "label": "1"
     }
 
-    # The dicionaries are used to set up shortAnswerInstances.
+    # The dicionaries are used to set up ShortAnswerInstance objects.
     return [instance1, instance2, instance3]
 
 
@@ -293,18 +295,3 @@ def test_trainFromAnswers(client, mock_instances):
     assert response.status_code == 200
     assert path_exists
     assert session_stored
-
-
-# Todo: This test must be changed once the dummy implementation
-#       has been replaced.
-def test_extract_features(mock_instances):
-    # The instance dictionaries are converted to ShortAnswerInstance objects.
-    instances = [main.ShortAnswerInstance(**instance) for instance in mock_instances]
-
-    features = extract_features(instances)
-
-    assert list(features["item_eq_answer"]) == [1, 0, 1]
-
-    # Test that the randomly generated values are either 0 or 1.
-    for outcome in features["outcome"]:
-        assert outcome in (0, 1)
