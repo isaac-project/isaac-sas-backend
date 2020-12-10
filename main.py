@@ -49,9 +49,27 @@ include_norm = [
 ]
 dependent_variable = include_norm[-1]
 
+
+# Todo: This Dummy Class must be removed once there are real subclasses of 
+# the FeatureGroupExtractor base class.
+class DummyExtractor(FeatureGroupExtractor):
+    def extract(self, instances) -> DataFrame:
+
+        answer_in_items = []
+        for instance in instances:
+            if instance.answer in instance.itemTargets:
+                answer_in_items.append(1)
+            else:
+                answer_in_items.append(0)
+        outcome = [0, 1, 0]
+
+        df = pd.DataFrame(zip(answer_in_items, outcome), columns=["item_eq_answer", "outcome"])
+        return df
+
+
 # All feature extractor objects that should be used, are defined here.
-# At the moment the list only holds the base class as a placeholder.
-ft_extractors = [FeatureGroupExtractor]
+# At the moment the list only holds the Dummy Extractor.
+ft_extractors = [DummyExtractor()]
 
 onnx_model_dir = "onnx_models"
 
@@ -223,21 +241,14 @@ def trainFromAnswers(req: TrainFromLanguageDataRequest):
 
     df = pd.DataFrame()
 
-    # Todo: An abstract method cannot be run, so this for loop does not work yet.
-    #       Once the child classes of FeatureGroupExtractor are usable, it can be used.
-    # for ft_extractor in ft_extractors:
-    #     df = pd.concat([df, ft_extractor.extract(req.instances)], axis=1)
+    for ft_extractor in ft_extractors:
+        df = pd.concat([df, ft_extractor.extract(req.instances)], axis=1)
 
-    # Todo: Here the dependent variable is just the label of the first ShortAnswerInstance
-    #       object. This is just temporary and must be changed for real implementation.
-    dependent_variable = req.instances[0].label
-
-    # Fixme: do_training does not accept an empty dataframe so this one serves as a dummy.
-    # Todo: This line must be removed once real implementations exist.
-    df = pd.DataFrame([[1, 0], [1, 1], [0, 0]], columns=["item_eq_answer", dependent_variable])
     include = list(df.columns)
 
-    return do_training(df, model_id, include=include, dependent_variable=dependent_variable)
+    # Todo: The hardcoded dependent variable must be changed for real
+    # implementations of feature extractor objects.
+    return do_training(df, model_id, include=include, dependent_variable="outcome")
 
 
 def do_training(
