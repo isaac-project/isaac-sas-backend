@@ -11,6 +11,8 @@ from fastapi import FastAPI
 from fastapi import HTTPException
 from features import uima
 from features.extractor import FeatureExtraction
+from features.feature_groups import FeatureGroupExtractor
+from features.data import ShortAnswerInstance
 from cassis.xmi import load_cas_from_xmi
 from io import BytesIO
 from pandas.core.frame import DataFrame
@@ -46,6 +48,28 @@ include_norm = [
     "Outcome",
 ]
 dependent_variable = include_norm[-1]
+
+
+# Todo: This Dummy Class must be removed once there are real subclasses of 
+# the FeatureGroupExtractor base class.
+class DummyExtractor(FeatureGroupExtractor):
+    def extract(self, instances) -> DataFrame:
+
+        answer_in_items = []
+        for instance in instances:
+            if instance.answer in instance.itemTargets:
+                answer_in_items.append(1)
+            else:
+                answer_in_items.append(0)
+        outcome = [0, 1, 0]
+
+        df = pd.DataFrame(zip(answer_in_items, outcome), columns=["item_eq_answer", "outcome"])
+        return df
+
+
+# All feature extractor objects that should be used, are defined here.
+# At the moment the list only holds the Dummy Extractor.
+ft_extractors = [DummyExtractor()]
 
 onnx_model_dir = "onnx_models"
 
@@ -89,15 +113,6 @@ class TrainFromCASRequest(BaseModel):
 class TrainingInstance(BaseModel):
     fileName: str
     modelId: str
-
-
-class ShortAnswerInstance(BaseModel):
-    taskId: str
-    itemId: str
-    itemPrompt: str
-    itemTargets: List[str]
-    learnerId: str
-    answer: str
 
 
 class TrainFromLanguageDataRequest(BaseModel):
@@ -224,37 +239,16 @@ def trainFromCASes(req: TrainFromCASRequest):
 def trainFromAnswers(req: TrainFromLanguageDataRequest):
     model_id = req.modelId
 
-    df = extract_features(req.instances)
+    df = pd.DataFrame()
+
+    for ft_extractor in ft_extractors:
+        df = pd.concat([df, ft_extractor.extract(req.instances)], axis=1)
+
     include = list(df.columns)
 
-    return do_training(df, model_id, include=include, dependent_variable=include[-1])
-
-
-def extract_features(instances: List[ShortAnswerInstance]) -> DataFrame:
-
-    # This is a dummy feature setup, which will be replaced by the real
-    # one later.
-    features = []
-
-    # The import should be removed once the dummy is removed.
-    from random import randint
-
-    for instance in instances:
-        item_eq_answer = []
-        if any(target == instance.answer for target in instance.itemTargets):
-            item_eq_answer.append(1)
-        else:
-            item_eq_answer.append(0)
-
-        # Also create dummy values for the outcome variable.
-        item_eq_answer.append(randint(0, 1))
-
-        features.append(item_eq_answer)
-
-    columns = ["item_eq_answer", "outcome"]
-    # Dummy setup ends here, all this code needs to be replaced.
-
-    return pd.DataFrame(features, columns=columns)
+    # Todo: The hardcoded dependent variable must be changed for real
+    # implementations of feature extractor objects.
+    return do_training(df, model_id, include=include, dependent_variable="outcome")
 
 
 def do_training(
