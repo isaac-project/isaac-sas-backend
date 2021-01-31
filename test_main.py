@@ -29,7 +29,7 @@ def mock_instances():
         "itemTargets": ["one", "two", "three"],
         "learnerId": "0",
         "answer": "two",
-        "label": "outcome"
+        "label": "label1"
     }
     instance2 = {
         "taskId": "1",
@@ -38,7 +38,7 @@ def mock_instances():
         "itemTargets": ["four", "five", "six"],
         "learnerId": "1",
         "answer": "two",
-        "label": "outcome"
+        "label": "label1"
     }
     instance3 = {
         "taskId": "2",
@@ -47,7 +47,7 @@ def mock_instances():
         "itemTargets": ["four", "five", "six"],
         "learnerId": "2",
         "answer": "five",
-        "label": "outcome"
+        "label": "label2"
     }
 
     # The dicionaries are used to set up ShortAnswerInstance objects.
@@ -289,7 +289,6 @@ def test_trainFromAnswers(client, mock_instances):
     if path_exists:
         os.remove(os.path.join(main.onnx_model_dir, "random_data.onnx"))
     main.onnx_model_dir = "onnx_models"
-
     # The assertions are made after the clean-up process on the basis of the
     # stored states. This ensures that cleaning is done in any case.
     assert response.status_code == 200

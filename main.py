@@ -11,7 +11,7 @@ from fastapi import FastAPI
 from fastapi import HTTPException
 from features import uima
 from features.extractor import FeatureExtraction
-from features.feature_groups import FeatureGroupExtractor
+from features.feature_groups import SIMGroupExtractor
 from features.data import ShortAnswerInstance
 from cassis.xmi import load_cas_from_xmi
 from io import BytesIO
@@ -29,7 +29,6 @@ except:
     from _dummy_thread import allocate_lock as Lock
 
 app = FastAPI()
-
 
 # These are the standard input features for the two endpoints
 # /train and /trainFromCASes.
@@ -49,27 +48,9 @@ include_norm = [
 ]
 dependent_variable = include_norm[-1]
 
-
-# Todo: This Dummy Class must be removed once there are real subclasses of 
-# the FeatureGroupExtractor base class.
-class DummyExtractor(FeatureGroupExtractor):
-    def extract(self, instances) -> DataFrame:
-
-        answer_in_items = []
-        for instance in instances:
-            if instance.answer in instance.itemTargets:
-                answer_in_items.append(1)
-            else:
-                answer_in_items.append(0)
-        outcome = [0, 1, 0]
-
-        df = pd.DataFrame(zip(answer_in_items, outcome), columns=["item_eq_answer", "outcome"])
-        return df
-
-
 # All feature extractor objects that should be used, are defined here.
 # At the moment the list only holds the Dummy Extractor.
-ft_extractors = [DummyExtractor()]
+ft_extractors = [SIMGroupExtractor()]
 
 onnx_model_dir = "onnx_models"
 
@@ -244,11 +225,12 @@ def trainFromAnswers(req: TrainFromLanguageDataRequest):
     for ft_extractor in ft_extractors:
         df = pd.concat([df, ft_extractor.extract(req.instances)], axis=1)
 
+    labels = pd.DataFrame([instance.label for instance in req.instances], columns=["labels"])
+    df = pd.concat([df, labels], axis=1)
+
     include = list(df.columns)
 
-    # Todo: The hardcoded dependent variable must be changed for real
-    # implementations of feature extractor objects.
-    return do_training(df, model_id, include=include, dependent_variable="outcome")
+    return do_training(df, model_id, include=include, dependent_variable="labels")
 
 
 def do_training(
@@ -262,6 +244,11 @@ def do_training(
     from sklearn.ensemble import RandomForestClassifier as rf
 
     df_ = df[include]
+    # The label is taken out before one-hot encoded variables are computed.
+    # This is important not to have the one-hot transformation performed on the label.
+    y = df[dependent_variable]
+    df.drop([dependent_variable], axis=1)
+
     categoricals = []  # going to one-hot encode categorical variables
 
     for col, col_type in df_.dtypes.items():
@@ -275,7 +262,6 @@ def do_training(
     # get_dummies effectively creates one-hot encoded variables
     df_ohe = pd.get_dummies(df_, columns=categoricals, dummy_na=True)
     x = df_ohe[df_ohe.columns.difference([dependent_variable])]
-    y = df_ohe[dependent_variable]
 
     # build classifier
     with lock:
