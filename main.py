@@ -1,3 +1,4 @@
+import json
 import os
 import shutil
 import time
@@ -6,11 +7,13 @@ import numpy as np
 import onnxruntime as rt
 import pandas as pd
 import math
+import sys
 
 from fastapi import FastAPI
 from fastapi import HTTPException
 from features import uima
 from features.extractor import FeatureExtraction
+from features.feature_groups import BOWGroupExtractor
 from features.feature_groups import SIMGroupExtractor
 from features.data import ShortAnswerInstance
 from cassis.xmi import load_cas_from_xmi
@@ -19,6 +22,12 @@ from pandas.core.frame import DataFrame
 from pydantic import BaseModel
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import FloatTensorType
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import accuracy_score
+from sklearn.metrics import classification_report
+from sklearn.metrics import cohen_kappa_score
+from sklearn.svm import SVC
+from sklearn.model_selection import KFold
 from typing import Dict
 from typing import List
 from typing import Union
@@ -47,10 +56,6 @@ include_norm = [
     "Outcome",
 ]
 dependent_variable = include_norm[-1]
-
-# All feature extractor objects that should be used, are defined here.
-# At the moment the list only holds the Dummy Extractor.
-ft_extractors = [SIMGroupExtractor()]
 
 onnx_model_dir = "onnx_models"
 
@@ -219,18 +224,93 @@ def trainFromCASes(req: TrainFromCASRequest):
 @app.post("/trainFromAnswers")
 def trainFromAnswers(req: TrainFromLanguageDataRequest):
     model_id = req.modelId
+    # All feature extractor objects that should be used, are defined here.
+    ft_extractors = [SIMGroupExtractor()]
 
     df = pd.DataFrame()
-
+    
+    # Note that the BOW feature extractor is set up later because it needs a new
+    # setup for every new train-test split.
     for ft_extractor in ft_extractors:
         df = pd.concat([df, ft_extractor.extract(req.instances)], axis=1)
 
     labels = pd.DataFrame([instance.label for instance in req.instances], columns=["labels"])
-    df = pd.concat([df, labels], axis=1)
 
-    include = list(df.columns)
+    best_metrics = init_best_metrics(model_id)
+    best_model = None
 
-    return do_training(df, model_id, include=include, dependent_variable="labels")
+    n_splits = (10 if df.shape[0] > 1000 else 5) if df.shape[0] > 50 else 2
+
+    kf = KFold(n_splits=n_splits, shuffle=True, random_state=2)
+    for train_ids, test_ids in kf.split(labels):
+
+        train_instances = [req.instances[idx] for idx in train_ids]
+        bow_extractor = BOWGroupExtractor(train_instances)
+
+        x = pd.concat([df, bow_extractor.extract(req.instances)], axis=1)
+
+        # NOTE: If categorical features are included, One-hot should be included here as well.
+
+        start = time.time()
+
+        clf = RandomForestClassifier()
+
+        x_train = x.iloc[train_ids]
+        y_train = labels.iloc[train_ids]
+        x_test = x.iloc[test_ids]
+        y_test = labels.iloc[test_ids]
+
+        clf.fit(x_train, y_train)
+
+        y_pred = clf.predict(x_test)
+
+        end = time.time()
+
+        metrics = classification_report(
+            y_test, y_pred, output_dict=True, target_names=["False", "True"]
+        )
+
+        accuracy = accuracy_score(y_test, y_pred)
+        f1 = metrics["macro avg"]["f1-score"]
+        cohens_kappa = cohen_kappa_score(y_test, y_pred)
+
+        # Add accuracy and cohens kappa to the metrics dictionary.
+        metrics["accuracy"] = accuracy
+        metrics["cohens_kappa"] = cohens_kappa
+
+        best_list = best_metrics[model_id]
+
+        best_acc = best_list["accuracy"]
+        best_f1 = best_list["f1"]
+        best_ck = best_list["cohens_kappa"]
+
+        for best, current in zip(
+            (best_acc, best_f1, best_ck), (accuracy, f1, cohens_kappa)
+        ):
+            if current > best["value"]:
+                best["value"] = current
+                best["metrics"] = metrics
+                best["model_type"] = clf.__class__.__name__
+
+        best_list["train_time"] = end - start
+
+        # TODO: How to determine which model should be stored 
+        # (accuracy, f1, cohens kappa)?
+        if not best_model or accuracy > best_acc["value"]:
+            best_model = clf
+            model_columns = list(x.columns)
+            num_features = clf.n_features_
+
+    # Write best results metrics to file
+    with open("model_metrics/" + model_id + ".json", "w") as score_file:
+        json.dump(best_metrics, score_file, indent=4)
+
+    # Store all models (no double storing if same model).
+    store_as_onnx(best_model, model_id, model_columns, num_features)
+
+    return best_metrics
+
+    # return do_training(df, model_id, include=include, dependent_variable="labels")
 
 
 def do_training(
@@ -239,15 +319,12 @@ def do_training(
     include: List[str] = include_norm,
     dependent_variable: str = dependent_variable,
 ) -> str:
-    # using random forest as an example
-    # can do the training separately and just update the pickles
-    from sklearn.ensemble import RandomForestClassifier as rf
 
     df_ = df[include]
     # The label is taken out before one-hot encoded variables are computed.
     # This is important not to have the one-hot transformation performed on the label.
     y = df[dependent_variable]
-    df.drop([dependent_variable], axis=1)
+    df_.drop(columns=[dependent_variable], axis=1, inplace=True)
 
     categoricals = []  # going to one-hot encode categorical variables
 
@@ -263,21 +340,105 @@ def do_training(
     df_ohe = pd.get_dummies(df_, columns=categoricals, dummy_na=True)
     x = df_ohe[df_ohe.columns.difference([dependent_variable])]
 
+    best_metrics = init_best_metrics(model_id)
+    best_model = None
+
+    n_splits = (10 if x.shape[0] > 1000 else 5) if x.shape[0] > 50 else 2
+
     # build classifier
     with lock:
-        clf = rf()
-        start = time.time()
-        clf.fit(x, y)
-        # Store the score, model columns and the output classes for later use.
-        model_score = clf.score(x, y)
-        model_columns = list(x.columns)
 
-    # The number of features of the model is obtained from the n_features_ attribute.
-    # Fixme: Note that this works for the Random Forest Classifier in sklearn
-    #        but does not work for all other model types.
-    num_features = clf.n_features_
+        kf = KFold(n_splits=n_splits, shuffle=True, random_state=2)
+        for train_ids, test_ids in kf.split(x):
+
+            start = time.time()
+
+            clf = RandomForestClassifier()
+
+            x_train = x.iloc[train_ids]
+            y_train = y.iloc[train_ids]
+            x_test = x.iloc[test_ids]
+            y_test = y.iloc[test_ids]
+
+            clf.fit(x_train, y_train)
+
+            y_pred = clf.predict(x_test)
+
+            end = time.time()
+
+            metrics = classification_report(
+                y_test, y_pred, output_dict=True, target_names=["False", "True"]
+            )
+
+            accuracy = accuracy_score(y_test, y_pred)
+            f1 = metrics["macro avg"]["f1-score"]
+            cohens_kappa = cohen_kappa_score(y_test, y_pred)
+
+            # Add accuracy and cohens kappa to the metrics dictionary.
+            metrics["accuracy"] = accuracy
+            metrics["cohens_kappa"] = cohens_kappa
+
+            best_list = best_metrics[model_id]
+
+            best_acc = best_list["accuracy"]
+            best_f1 = best_list["f1"]
+            best_ck = best_list["cohens_kappa"]
+
+            for best, current in zip(
+                (best_acc, best_f1, best_ck), (accuracy, f1, cohens_kappa)
+            ):
+                if current > best["value"]:
+                    best["value"] = current
+                    best["metrics"] = metrics
+                    best["model_type"] = clf.__class__.__name__
+
+            best_list["train_time"] = end - start
+
+            # TODO: How to determine which model should be stored 
+            # (accuracy, f1, cohens kappa)?
+            if not best_model or accuracy > best_acc["value"]:
+                best_model = clf
+
+    # Write best results metrics to file
+    with open("model_metrics/" + model_id + ".json", "w") as score_file:
+        json.dump(best_metrics, score_file, indent=4)
+
+    model_columns = list(x.columns)
+    num_features = x.shape[1]
+    # Store all models (no double storing if same model).
+    store_as_onnx(best_model, model_id, model_columns, num_features)
+
+    return best_metrics
+
+
+def init_best_metrics(model_id):
+    # Initialize the best training acc, f1, cohens kappa and their models.
+    metrics_out = {
+        model_id: {
+            "accuracy": {
+                "value": 0.0,
+                "metrics": None,
+                "model_type": None,
+            },
+            "f1": {
+                "value": 0.0,
+                "metrics": None,
+                "model_type": None,
+            },
+            "cohens_kappa": {
+                "value": 0.0,
+                "metrics": None,
+                "model_type": None,
+            },
+        }
+    }
+
+    return metrics_out
+
+
+def store_as_onnx(model, model_id, model_columns, num_features):
     initial_type = [("float_input", FloatTensorType([None, num_features]))]
-    clf_onnx = convert_sklearn(clf, initial_types=initial_type)
+    clf_onnx = convert_sklearn(model, initial_types=initial_type, target_opset=12)
 
     # Manually pass the model columns to the converted model using the
     # metadata_props attribute.
@@ -294,12 +455,6 @@ def do_training(
     inf_sessions[model_id] = rt.InferenceSession(
         "{}/{}.onnx".format(onnx_model_dir, model_id)
     )
-
-    message1 = "Trained in %.5f seconds" % (time.time() - start)
-    message2 = "Model training score: %s" % model_score
-    return_message = "Success. \n{0}. \n{1}.".format(message1, message2)
-
-    return return_message
 
 
 @app.post("/train")

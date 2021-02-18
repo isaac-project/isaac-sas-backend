@@ -29,7 +29,7 @@ def mock_instances():
         "itemTargets": ["one", "two", "three"],
         "learnerId": "0",
         "answer": "two",
-        "label": "label1"
+        "label": 1
     }
     instance2 = {
         "taskId": "1",
@@ -38,7 +38,7 @@ def mock_instances():
         "itemTargets": ["four", "five", "six"],
         "learnerId": "1",
         "answer": "two",
-        "label": "label1"
+        "label": 1
     }
     instance3 = {
         "taskId": "2",
@@ -47,11 +47,27 @@ def mock_instances():
         "itemTargets": ["four", "five", "six"],
         "learnerId": "2",
         "answer": "five",
-        "label": "label2"
+        "label": 2
     }
+    instance4 = {
+        "taskId": "2",
+        "itemId": "2",
+        "itemPrompt": "mock_prompt3",
+        "itemTargets": ["four", "five", "six"],
+        "learnerId": "2",
+        "answer": "five",
+        "label": 2
+    }
+    instances = [instance1, instance2, instance3, instance4]
+
+    for _ in range(20):
+        instances.append(instance1)
+        instances.append(instance2)
+        instances.append(instance3)
+        instances.append(instance4)
 
     # The dicionaries are used to set up ShortAnswerInstance objects.
-    return [instance1, instance2, instance3]
+    return instances
 
 
 def test_predict(client, xmi_bytes):
@@ -142,6 +158,7 @@ def test_addInstance_no_model_ID(client, xmi_bytes):
     )
 
 
+@pytest.mark.skip("The input has only one item, which cannot be processed by cross validation.")
 def test_trainFromCASes(client, xmi_bytes):
     """
     Test the /train_from_CASes endpoint with test data.
@@ -280,6 +297,7 @@ def test_trainFromAnswers(client, mock_instances):
 
     # Store states to check whether the file and session object were created.
     path_exists = os.path.exists(os.path.join(main.onnx_model_dir, "random_data.onnx"))
+    metrics_path_exists = path_exists = os.path.exists(os.path.join("model_metrics", "random_data.json"))
     session_stored = "random_data" in main.inf_sessions
 
     # Change onnx model directory back and delete test file and inference
@@ -288,6 +306,8 @@ def test_trainFromAnswers(client, mock_instances):
         del main.inf_sessions["random_data"]
     if path_exists:
         os.remove(os.path.join(main.onnx_model_dir, "random_data.onnx"))
+    if metrics_path_exists:
+        os.remove(os.path.join("model_metrics", "random_data.json"))
     main.onnx_model_dir = "onnx_models"
     # The assertions are made after the clean-up process on the basis of the
     # stored states. This ensures that cleaning is done in any case.
