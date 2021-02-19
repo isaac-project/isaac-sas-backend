@@ -189,6 +189,7 @@ def test_trainFromCASes(client, xmi_bytes):
     path_exists = os.path.exists(
         os.path.join(main.onnx_model_dir, "default_cas_test.onnx")
     )
+    metrics_path_exists = os.path.exists(os.path.join("model_metrics", "random_data.json"))
     session_stored = "default_cas_test" in main.inf_sessions
 
     # Change onnx model directory back and delete test file and inference
@@ -197,6 +198,8 @@ def test_trainFromCASes(client, xmi_bytes):
         del main.inf_sessions["default_cas_test"]
     if path_exists:
         os.remove(os.path.join(main.onnx_model_dir, "default_cas_test.onnx"))
+    if metrics_path_exists:
+        os.remove(os.path.join("model_metrics", "random_data.json"))
     main.onnx_model_dir = "onnx_models"
 
     assert response.status_code == 200
@@ -261,6 +264,7 @@ def test_train(client):
 
     # Store states to check whether the file and session object were created.
     path_exists = os.path.exists(os.path.join(main.onnx_model_dir, "random_data.onnx"))
+    metrics_path_exists = os.path.exists(os.path.join("model_metrics", "random_data.json"))
     session_stored = "random_data" in main.inf_sessions
 
     # Change onnx model directory back and delete test file and inference
@@ -269,6 +273,8 @@ def test_train(client):
         del main.inf_sessions["random_data"]
     if path_exists:
         os.remove(os.path.join(main.onnx_model_dir, "random_data.onnx"))
+    if metrics_path_exists:
+        os.remove(os.path.join("model_metrics", "random_data.json"))
     main.onnx_model_dir = "onnx_models"
 
     # The assertions are made after the clean-up process on the basis of the
@@ -297,7 +303,7 @@ def test_trainFromAnswers(client, mock_instances):
 
     # Store states to check whether the file and session object were created.
     path_exists = os.path.exists(os.path.join(main.onnx_model_dir, "random_data.onnx"))
-    metrics_path_exists = path_exists = os.path.exists(os.path.join("model_metrics", "random_data.json"))
+    metrics_path_exists = os.path.exists(os.path.join("model_metrics", "random_data.json"))
     session_stored = "random_data" in main.inf_sessions
 
     # Change onnx model directory back and delete test file and inference
