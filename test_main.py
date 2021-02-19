@@ -60,7 +60,7 @@ def mock_instances():
     }
     instances = [instance1, instance2, instance3, instance4]
 
-    for _ in range(20):
+    for _ in range(10):
         instances.append(instance1)
         instances.append(instance2)
         instances.append(instance3)
