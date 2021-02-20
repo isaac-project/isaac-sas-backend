@@ -70,6 +70,36 @@ def mock_instances():
     return instances
 
 
+@pytest.fixture()
+def predict_instances():
+    instance1 = {
+        "taskId": "0",
+        "itemId": "0",
+        "itemPrompt": "mock_prompt",
+        "itemTargets": ["one", "two", "three"],
+        "learnerId": "0",
+        "answer": "two",
+    }
+    instance2 = {
+        "taskId": "1",
+        "itemId": "1",
+        "itemPrompt": "mock_prompt2",
+        "itemTargets": ["two", "three", "four"],
+        "learnerId": "1",
+        "answer": "two",
+    }
+    instance3 = {
+        "taskId": "2",
+        "itemId": "2",
+        "itemPrompt": "mock_prompt3",
+        "itemTargets": ["four", "five", "six"],
+        "learnerId": "2",
+        "answer": "five",
+    }
+
+    return [instance1, instance2, instance3]
+
+
 def test_predict(client, xmi_bytes):
     """
     Test the /addInstance endpoint with an example model.
@@ -90,8 +120,9 @@ def test_predict(client, xmi_bytes):
 
     assert response.status_code == 200
 
-    # Assert that all values are between 0 and 1.
-    assert 0 <= response.json()["prediction"] <= 1
+    # Assert that the value for the predicted class is 1.
+    # (because this is the label in the CAS instance).
+    assert response.json()["prediction"] == 1
 
     for cls in response.json()["classProbabilities"]:
         assert 0 <= response.json()["classProbabilities"][cls] <= 1
@@ -254,10 +285,10 @@ def test_train(client):
     :param client: A client for testing.
     """
     # Change the onnx model directory for testing purposes.
-    main.onnx_model_dir = "testdata/train_data"
+    main.onnx_model_dir = "testdata/train_data/onnx"
 
     instance_dict = {
-        "fileName": os.path.join(main.onnx_model_dir, "random_train_data.tsv"),
+        "fileName": os.path.join("testdata/train_data", "random_train_data.tsv"),
         "modelId": "random_data",
     }
     response = client.post("/train", json=instance_dict)
@@ -289,11 +320,11 @@ def test_trainFromAnswers(client, mock_instances):
     Test the /trainFromAnswers endpoint.
 
     :param client: A client for testing.
-    :param mock_instances: Mock short answer instances in dictonary
-    form.
+    :param mock_instances: Mock short answer instances
     """
     # Change the onnx model directory for testing purposes.
-    main.onnx_model_dir = "testdata/train_data"
+    main.onnx_model_dir = "testdata/train_data/onnx"
+    main.bow_model_dir = "testdata/train_data/bow"
 
     instance_dict = {
         "instances": mock_instances,
@@ -303,20 +334,50 @@ def test_trainFromAnswers(client, mock_instances):
 
     # Store states to check whether the file and session object were created.
     path_exists = os.path.exists(os.path.join(main.onnx_model_dir, "random_data.onnx"))
+    bow_path_exists = os.path.exists(os.path.join(main.bow_model_dir, "random_data.pkl"))
     metrics_path_exists = os.path.exists(os.path.join("model_metrics", "random_data.json"))
     session_stored = "random_data" in main.inf_sessions
 
-    # Change onnx model directory back and delete test file and inference
-    # session object.
+    # Delete all files that have been created during training.
     if session_stored:
         del main.inf_sessions["random_data"]
     if path_exists:
         os.remove(os.path.join(main.onnx_model_dir, "random_data.onnx"))
+    if bow_path_exists:
+        os.remove(os.path.join(main.bow_model_dir, "random_data.pkl"))
     if metrics_path_exists:
         os.remove(os.path.join("model_metrics", "random_data.json"))
+
     main.onnx_model_dir = "onnx_models"
+    main.bow_model_dir = "bow_models"
     # The assertions are made after the clean-up process on the basis of the
     # stored states. This ensures that cleaning is done in any case.
     assert response.status_code == 200
     assert path_exists
+    assert bow_path_exists
+    assert metrics_path_exists
     assert session_stored
+
+
+def test_predictFromAnswers(client, mock_instances, predict_instances):
+    """
+    Test the /predictFromAnswers endpoint.
+
+    :param client: A client for testing.
+    :param mock_instances: Mock short answer instances that do not have labels
+    """
+    pred_instance_dict = {
+        "instances": predict_instances,
+        "modelId": "test_pred_data",
+    }
+
+    pred_response = client.post("/predictFromAnswers", json=pred_instance_dict)
+
+    assert pred_response.status_code == 200
+
+    response_dict = json.loads(pred_response.content.decode("utf-8"))
+    assert response_dict["predictions"][0]["prediction"] == 1
+    assert response_dict["predictions"][1]["prediction"] == 1
+    assert response_dict["predictions"][2]["prediction"] == 2
+
+    assert len(main.bow_models) == 2

@@ -6,6 +6,7 @@ import base64
 import numpy as np
 import onnxruntime as rt
 import pandas as pd
+import pickle
 import math
 import sys
 
@@ -58,6 +59,7 @@ include_norm = [
 dependent_variable = include_norm[-1]
 
 onnx_model_dir = "onnx_models"
+bow_model_dir = "bow_models"
 
 # UIMA / features stuff
 # type system
@@ -70,7 +72,6 @@ lock = Lock()
 
 # Inference session object for predictions.
 inf_sessions = {}
-
 # Store all model objects and inference session objects in memory for
 # quick access.
 for model_file in os.listdir(onnx_model_dir):
@@ -79,6 +80,19 @@ for model_file in os.listdir(onnx_model_dir):
         inf_sessions[model_id] = rt.InferenceSession(
             os.path.join(onnx_model_dir, model_file)
         )
+
+# For prediction from ShortAnswerInstances the BOW model belonging to the ML model
+# must be loaded for feature extraction.
+bow_models = {}
+for bow_file in os.listdir(bow_model_dir):
+    # Ignore hidden files like .keep
+    if bow_file.startswith("."):
+        continue
+    model_id = bow_file.rstrip(".pkl")
+    if model_id not in bow_models:
+        bow_path = os.path.join(bow_model_dir, bow_file)
+        with open(bow_path, "rb") as bowf:
+            bow_models[model_id] = pickle.load(bowf)
 
 
 class ClassificationInstance(BaseModel):
@@ -106,6 +120,20 @@ class TrainFromLanguageDataRequest(BaseModel):
     modelId: str
 
 
+class PredictFromLanguageDataRequest(BaseModel):
+    instances: List[ShortAnswerInstance]
+    modelId: str
+
+
+class SinglePrediction(BaseModel):
+    prediction: int
+    classProbabilities: Dict[Union[str, int], float]
+
+
+class PredictFromLanguageDataResponse(BaseModel):
+    predictions: List[SinglePrediction]
+
+
 def do_prediction(data: DataFrame, model_id: str = None) -> dict:
 
     session = inf_sessions[model_id]
@@ -120,7 +148,7 @@ def do_prediction(data: DataFrame, model_id: str = None) -> dict:
     # https://github.com/amirziai/sklearnflask/issues/3
     # Thanks to @lorenzori
     query = query.reindex(columns=model_columns, fill_value=0)
-
+    response_model=CASPrediction
     input_name = session.get_inputs()[0].name
     # The predict_proba function is used because get_outputs() is indexed at 1.
     # If it is indexed at 0, the predict method is used.
@@ -131,7 +159,6 @@ def do_prediction(data: DataFrame, model_id: str = None) -> dict:
     # The Prediction dictionary is stored in a list by ONNX so it can be
     # retrieved by indexing.
     probs = pred[0]
-    print(probs)
 
     # prediction is the class with max probability
     return {
@@ -291,6 +318,10 @@ def trainFromAnswers(req: TrainFromLanguageDataRequest):
                 best["value"] = current
                 best["metrics"] = metrics
                 best["model_type"] = clf.__class__.__name__
+                bow_models[model_id] = bow_extractor
+                bow_path = os.path.join(bow_model_dir, model_id + ".pkl")
+                with open(bow_path, "wb") as bowf:
+                    pickle.dump(bow_extractor, bowf)
 
         best_list["train_time"] = end - start
 
@@ -455,6 +486,41 @@ def store_as_onnx(model, model_id, model_columns, num_features):
     inf_sessions[model_id] = rt.InferenceSession(
         "{}/{}.onnx".format(onnx_model_dir, model_id)
     )
+
+
+@app.post("/predictFromAnswers", response_model=PredictFromLanguageDataResponse)
+def predictFromAnswers(req: PredictFromLanguageDataRequest):
+    model_id = req.modelId
+
+    if model_id not in [model.rstrip(".onnx") for model in os.listdir(onnx_model_dir)]:
+        raise HTTPException(
+            status_code=422,
+            detail='Model with model ID "{}" could not be'
+            " found in the ONNX model directory."
+            " Please train first.".format(model_id),
+        )
+    if model_id not in [model.rstrip(".pkl") for model in os.listdir(bow_model_dir)]:
+        raise HTTPException(
+            status_code=422,
+            detail='BOW Model with model ID "{}" could not be'
+            " found in the Bag of words model directory."
+            " Please check that the model was trained with training"
+            " instances (not with CAS).".format(model_id),
+        )
+
+    bow_extractor = bow_models[model_id]
+    ft_extractors = [SIMGroupExtractor(), bow_extractor]
+
+    predictions = []
+
+    for instance in req.instances:        
+        data = pd.DataFrame()
+        for ft_extractor in ft_extractors:
+            data = pd.concat([data, ft_extractor.extract([instance])], axis=1)
+
+        predictions.append(do_prediction(data, model_id))
+
+    return {"predictions": predictions}
 
 
 @app.post("/train")
