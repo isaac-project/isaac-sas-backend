@@ -359,7 +359,7 @@ def test_trainFromAnswers(client, mock_instances):
     assert session_stored
 
 
-def test_predictFromAnswers(client, mock_instances, predict_instances):
+def test_predictFromAnswers(client, predict_instances):
     """
     Test the /predictFromAnswers endpoint.
 
@@ -379,5 +379,3 @@ def test_predictFromAnswers(client, mock_instances, predict_instances):
     assert response_dict["predictions"][0]["prediction"] == 1
     assert response_dict["predictions"][1]["prediction"] == 1
     assert response_dict["predictions"][2]["prediction"] == 2
-
-    assert len(main.bow_models) == 2
