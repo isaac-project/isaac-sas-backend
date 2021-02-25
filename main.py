@@ -27,7 +27,7 @@ from sklearn.metrics import accuracy_score
 from sklearn.metrics import classification_report
 from sklearn.metrics import cohen_kappa_score
 from sklearn.svm import SVC
-from sklearn.model_selection import KFold
+from sklearn.model_selection import StratifiedKFold
 from typing import Dict
 from typing import List
 from typing import Union
@@ -241,9 +241,10 @@ def trainFromAnswers(req: TrainFromLanguageDataRequest):
 
     n_splits = (10 if df.shape[0] > 1000 else 5) if df.shape[0] > 50 else 2
 
-    kf = KFold(n_splits=n_splits, shuffle=True, random_state=2)
-    for train_ids, test_ids in kf.split(labels):
-
+    skf = StratifiedKFold(n_splits=n_splits, shuffle=True, random_state=2)
+    for train_ids, test_ids in skf.split(df, labels):
+        
+        # The right indices must be found to extract the BOW features for the correct instances.
         train_instances = [req.instances[idx] for idx in train_ids]
         bow_extractor = BOWGroupExtractor(train_instances)
 
@@ -348,8 +349,8 @@ def do_training(
     # build classifier
     with lock:
 
-        kf = KFold(n_splits=n_splits, shuffle=True, random_state=2)
-        for train_ids, test_ids in kf.split(x):
+        skf = StratifiedKFold(n_splits=n_splits, shuffle=True, random_state=2)
+        for train_ids, test_ids in skf.split(x, y):
 
             start = time.time()
 
