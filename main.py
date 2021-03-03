@@ -6,7 +6,6 @@ import base64
 import numpy as np
 import onnxruntime as rt
 import pandas as pd
-import pickle
 import math
 import sys
 
@@ -88,11 +87,15 @@ for bow_file in os.listdir(bow_model_dir):
     # Ignore hidden files like .keep
     if bow_file.startswith("."):
         continue
-    model_id = bow_file.rstrip(".pkl")
+    model_id = bow_file.rstrip(".json")
     if model_id not in bow_models:
         bow_path = os.path.join(bow_model_dir, bow_file)
-        with open(bow_path, "rb") as bowf:
-            bow_models[model_id] = pickle.load(bowf)
+        with open(bow_path) as bowf:
+            state_dict = json.load(bowf)
+            # Instances list is passed empty here because bag of words setup has 
+            # already been done.
+            bow_models[model_id] = BOWGroupExtractor([])
+            bow_models[model_id].bag = state_dict["bag"]
 
 
 class ClassificationInstance(BaseModel):
@@ -319,9 +322,9 @@ def trainFromAnswers(req: TrainFromLanguageDataRequest):
                 best["metrics"] = metrics
                 best["model_type"] = clf.__class__.__name__
                 bow_models[model_id] = bow_extractor
-                bow_path = os.path.join(bow_model_dir, model_id + ".pkl")
-                with open(bow_path, "wb") as bowf:
-                    pickle.dump(bow_extractor, bowf)
+                bow_path = os.path.join(bow_model_dir, model_id + ".json")
+                with open(bow_path, "w") as bowf:
+                    json.dump(bow_extractor.__dict__, bowf)
 
         best_list["train_time"] = end - start
 
@@ -499,7 +502,7 @@ def predictFromAnswers(req: PredictFromLanguageDataRequest):
             " found in the ONNX model directory."
             " Please train first.".format(model_id),
         )
-    if model_id not in [model.rstrip(".pkl") for model in os.listdir(bow_model_dir)]:
+    if model_id not in [model.rstrip(".json") for model in os.listdir(bow_model_dir)]:
         raise HTTPException(
             status_code=422,
             detail='BOW Model with model ID "{}" could not be'

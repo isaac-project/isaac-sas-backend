@@ -334,7 +334,7 @@ def test_trainFromAnswers(client, mock_instances):
 
     # Store states to check whether the file and session object were created.
     path_exists = os.path.exists(os.path.join(main.onnx_model_dir, "random_data.onnx"))
-    bow_path_exists = os.path.exists(os.path.join(main.bow_model_dir, "random_data.pkl"))
+    bow_path_exists = os.path.exists(os.path.join(main.bow_model_dir, "random_data.json"))
     metrics_path_exists = os.path.exists(os.path.join("model_metrics", "random_data.json"))
     session_stored = "random_data" in main.inf_sessions
 
@@ -344,7 +344,7 @@ def test_trainFromAnswers(client, mock_instances):
     if path_exists:
         os.remove(os.path.join(main.onnx_model_dir, "random_data.onnx"))
     if bow_path_exists:
-        os.remove(os.path.join(main.bow_model_dir, "random_data.pkl"))
+        os.remove(os.path.join(main.bow_model_dir, "random_data.json"))
     if metrics_path_exists:
         os.remove(os.path.join("model_metrics", "random_data.json"))
 
