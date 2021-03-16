@@ -379,3 +379,12 @@ def test_predictFromAnswers(client, predict_instances):
     assert response_dict["predictions"][0]["prediction"] == 1
     assert response_dict["predictions"][1]["prediction"] == 1
     assert response_dict["predictions"][2]["prediction"] == 2
+
+
+def test_fetchStoredModels(client):
+    response = client.post("/fetchStoredModels")
+    assert response.status_code == 200
+
+    response_dict = json.loads(response.content.decode("utf-8"))["modelIds"]
+
+    assert list(main.inf_sessions.keys()) == response_dict
