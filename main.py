@@ -137,6 +137,15 @@ class PredictFromLanguageDataResponse(BaseModel):
     predictions: List[SinglePrediction]
 
 
+class ModelIdResponse(BaseModel):
+    modelIds: List[str]
+
+
+@app.post("/fetchStoredModels", response_model=ModelIdResponse)
+def fetch_stored_models():
+    return {"modelIds": list(inf_sessions.keys())}
+
+
 def do_prediction(data: DataFrame, model_id: str = None) -> dict:
 
     session = inf_sessions[model_id]
