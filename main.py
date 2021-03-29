@@ -139,7 +139,7 @@ class PredictFromLanguageDataRequest(BaseModel):
 
 
 class SinglePrediction(BaseModel):
-    prediction: int
+    prediction: Union[int, str]
     classProbabilities: Dict[Union[str, int], float]
 
 
