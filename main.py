@@ -2,11 +2,9 @@ import json
 import os
 import shutil
 import time
-import base64
 import numpy as np
 import onnxruntime as rt
 import pandas as pd
-import math
 
 from fastapi import FastAPI
 from fastapi import HTTPException
@@ -16,8 +14,6 @@ from features.extractor import FeatureExtraction
 from features.feature_groups import BOWGroupExtractor
 from features.feature_groups import SIMGroupExtractor
 from features.data import ShortAnswerInstance
-from cassis.xmi import load_cas_from_xmi
-from io import BytesIO
 from pandas.core.frame import DataFrame
 from pydantic import BaseModel
 from skl2onnx import convert_sklearn
@@ -38,6 +34,8 @@ except:
 
 app = FastAPI()
 
+# TODO: The allow_origins=['*'] variable should probably changed and contain a
+#       specified number of origins.
 app.add_middleware(
     CORSMiddleware,
     allow_origins=['*'],
@@ -106,21 +104,6 @@ for bow_file in os.listdir(bow_model_dir):
             bow_models[model_id].bag = state_dict["bag"]
 
 
-class ClassificationInstance(BaseModel):
-    modelId: str
-    cas: str
-
-
-class CASPrediction(BaseModel):
-    prediction: int
-    classProbabilities: Dict[Union[str, int], float]
-    features: Dict[str, Union[float, int, None]]
-
-
-class TrainFromCASRequest(BaseModel):
-    modelId: str
-
-
 class TrainingInstance(BaseModel):
     fileName: str
     modelId: str
@@ -168,7 +151,6 @@ def do_prediction(data: DataFrame, model_id: str = None) -> dict:
     # https://github.com/amirziai/sklearnflask/issues/3
     # Thanks to @lorenzori
     query = query.reindex(columns=model_columns, fill_value=0)
-    response_model=CASPrediction
     input_name = session.get_inputs()[0].name
     # The predict_proba function is used because get_outputs() is indexed at 1.
     # If it is indexed at 0, the predict method is used.
@@ -185,87 +167,6 @@ def do_prediction(data: DataFrame, model_id: str = None) -> dict:
         "prediction": max(probs, key=lambda k: probs[k]),
         "classProbabilities": probs,
     }
-
-
-@app.post("/predict", response_model=CASPrediction)
-def predict(req: ClassificationInstance):
-    model_id = req.modelId
-    base64_cas = base64.b64decode(req.cas)
-
-    # Check that the model is stored in a file.
-    if model_id not in [model.rstrip(".onnx") for model in os.listdir(onnx_model_dir)]:
-        raise HTTPException(
-            status_code=422,
-            detail='Model with model ID "{}" could not be'
-            " found in the ONNX model directory."
-            " Please train first.".format(model_id),
-        )
-
-    print("printing deseralized json cas modelID: ", model_id)
-
-    # from_cases feature extraction
-    cas = load_cas_from_xmi(BytesIO(base64_cas), typesystem=isaac_ts)
-    print("loaded the cas...")
-    feats = extraction.from_cases([cas])
-    print("extracted feats")
-    data = pd.DataFrame.from_dict(feats)
-    prediction = do_prediction(data, model_id)
-    nan_to_none = lambda f: None if math.isnan(f) else f
-    prediction["features"] = {k: nan_to_none(v[0]) for k, v in feats.items()}
-    print(prediction)
-    return prediction
-
-
-@app.post("/addInstance")
-def addInstance(req: ClassificationInstance):
-    model_id = req.modelId
-    base64_string = base64.b64decode(req.cas)
-
-    if not model_id:
-        raise HTTPException(
-            status_code=400,
-            detail="No model ID passed as argument." " Please include a model ID.",
-        )
-
-    cas = load_cas_from_xmi(BytesIO(base64_string), typesystem=isaac_ts)
-    feats = extraction.from_cases([cas])
-    with lock:
-        if model_id in features:
-            # append new features
-            for name, value in feats.items():
-                print("Printing value inside addInstance: ", value)
-                features[model_id][name].append(value[0])
-        else:
-            features[model_id] = feats
-    print("Successfully added cas to model {}".format(model_id))
-    return "Successfully added cas to model {}".format(model_id)
-
-
-@app.post("/trainFromCASes")
-def trainFromCASes(req: TrainFromCASRequest):
-
-    model_id = req.modelId
-
-    if not model_id:
-        raise HTTPException(
-            status_code=400,
-            detail="No model id passed as argument. " "Please include a model ID",
-        )
-
-    if features.get(model_id):
-        print(
-            "type of features[model_id] in trainFromCASes: ", type(features[model_id])
-        )
-        data = pd.DataFrame.from_dict(features[model_id])
-        print("type of data in trainFromCASes (after DataFrame.from_dict: ", type(data))
-
-        return do_training(data, model_id)
-    else:
-        raise HTTPException(
-            status_code=422,
-            detail="No model here with id {}".format(model_id)
-            + ". Add CAS instances first.",
-        )
 
 
 @app.post("/trainFromAnswers")
@@ -290,7 +191,7 @@ def trainFromAnswers(req: TrainFromLanguageDataRequest):
 
     skf = StratifiedKFold(n_splits=n_splits, shuffle=True, random_state=2)
     for train_ids, test_ids in skf.split(df, labels):
-        
+
         # The right indices must be found to extract the BOW features for the correct instances.
         train_instances = [req.instances[idx] for idx in train_ids]
         bow_extractor = BOWGroupExtractor(train_instances)
@@ -542,22 +443,6 @@ def predictFromAnswers(req: PredictFromLanguageDataRequest):
         predictions.append(do_prediction(data, model_id))
 
     return {"predictions": predictions}
-
-
-@app.post("/train")
-def train(req: TrainingInstance):
-    model_id = req.modelId
-    file_name = req.fileName
-
-    print("Training")
-    if not model_id:
-        raise HTTPException(
-            status_code=400,
-            detail="No model id passed as argument. " "Please include a model ID",
-        )
-
-    df = pd.read_csv(file_name, delimiter="\t")
-    return do_training(df, model_id)
 
 
 @app.get("/wipe_models")
