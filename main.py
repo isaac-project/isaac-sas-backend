@@ -7,10 +7,10 @@ import numpy as np
 import onnxruntime as rt
 import pandas as pd
 import math
-import sys
 
 from fastapi import FastAPI
 from fastapi import HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from features import uima
 from features.extractor import FeatureExtraction
 from features.feature_groups import BOWGroupExtractor
@@ -26,7 +26,6 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import classification_report
 from sklearn.metrics import cohen_kappa_score
-from sklearn.svm import SVC
 from sklearn.model_selection import StratifiedKFold
 from typing import Dict
 from typing import List
@@ -39,7 +38,6 @@ except:
 
 app = FastAPI()
 
-from fastapi.middleware.cors import CORSMiddleware
 app.add_middleware(
     CORSMiddleware,
     allow_origins=['*'],
