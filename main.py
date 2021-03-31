@@ -9,8 +9,6 @@ import pandas as pd
 from fastapi import FastAPI
 from fastapi import HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from features import uima
-from features.extractor import FeatureExtraction
 from features.feature_groups import BOWGroupExtractor
 from features.feature_groups import SIMGroupExtractor
 from features.data import ShortAnswerInstance
@@ -27,10 +25,6 @@ from typing import Dict
 from typing import List
 from typing import Union
 
-try:
-    from _thread import allocate_lock as Lock
-except:
-    from _dummy_thread import allocate_lock as Lock
 
 app = FastAPI()
 
@@ -44,36 +38,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
-# These are the standard input features for the two endpoints
-# /train and /trainFromCASes.
-include_norm = [
-    "_InitialView-Keyword-Overlap",
-    "_InitialView-Token-Overlap",
-    "studentAnswer-Token-Overlap",
-    "_InitialView-Chunk-Overlap",
-    "studentAnswer-Chunk-Overlap",
-    "_InitialView-Triple-Overlap",
-    "studentAnswer-Triple-Overlap",
-    "LC_TOKEN-Match",
-    "LEMMA-Match",
-    "SYNONYM-Match",
-    "Variety",
-    "Outcome",
-]
-dependent_variable = include_norm[-1]
-
 onnx_model_dir = "onnx_models"
 bow_model_dir = "bow_models"
 
-# UIMA / features stuff
-# type system
-isaac_ts = uima.load_isaac_ts()
-# feature extraction
-extraction = FeatureExtraction()
 # in-memory feature data
 features = {}
-lock = Lock()
 
 # Inference session object for predictions.
 inf_sessions = {}
@@ -135,38 +104,6 @@ class ModelIdResponse(BaseModel):
 @app.post("/fetchStoredModels", response_model=ModelIdResponse)
 def fetch_stored_models():
     return {"modelIds": list(inf_sessions.keys())}
-
-
-def do_prediction(data: DataFrame, model_id: str = None) -> dict:
-
-    session = inf_sessions[model_id]
-
-    query = pd.get_dummies(data)
-    # The columns in string format are retrieved from the model and converted
-    # back to a list.
-    model_columns = (
-        session.get_modelmeta().custom_metadata_map["model_columns"].split(" ")
-    )
-
-    # https://github.com/amirziai/sklearnflask/issues/3
-    # Thanks to @lorenzori
-    query = query.reindex(columns=model_columns, fill_value=0)
-    input_name = session.get_inputs()[0].name
-    # The predict_proba function is used because get_outputs() is indexed at 1.
-    # If it is indexed at 0, the predict method is used.
-    label_name = session.get_outputs()[1].name
-    # Prediction takes place here.
-    pred = session.run([label_name], {input_name: query.to_numpy(dtype=np.float32)})[0]
-
-    # The Prediction dictionary is stored in a list by ONNX so it can be
-    # retrieved by indexing.
-    probs = pred[0]
-
-    # prediction is the class with max probability
-    return {
-        "prediction": max(probs, key=lambda k: probs[k]),
-        "classProbabilities": probs,
-    }
 
 
 @app.post("/trainFromAnswers")
@@ -263,106 +200,6 @@ def trainFromAnswers(req: TrainFromLanguageDataRequest):
 
     return best_metrics
 
-    # return do_training(df, model_id, include=include, dependent_variable="labels")
-
-
-def do_training(
-    df: DataFrame,
-    model_id: str = None,
-    include: List[str] = include_norm,
-    dependent_variable: str = dependent_variable,
-) -> str:
-
-    df_ = df[include]
-    # The label is taken out before one-hot encoded variables are computed.
-    # This is important not to have the one-hot transformation performed on the label.
-    y = df[dependent_variable]
-    df_.drop(columns=[dependent_variable], axis=1, inplace=True)
-
-    categoricals = []  # going to one-hot encode categorical variables
-
-    for col, col_type in df_.dtypes.items():
-        if col_type == "O":
-            categoricals.append(col)
-        else:
-            df_[col].fillna(
-                0, inplace=True
-            )  # fill NA's with 0 for ints/floats, too generic
-
-    # get_dummies effectively creates one-hot encoded variables
-    df_ohe = pd.get_dummies(df_, columns=categoricals, dummy_na=True)
-    x = df_ohe[df_ohe.columns.difference([dependent_variable])]
-
-    best_metrics = init_best_metrics(model_id)
-    best_model = None
-
-    n_splits = (10 if x.shape[0] > 1000 else 5) if x.shape[0] > 50 else 2
-
-    # build classifier
-    with lock:
-
-        skf = StratifiedKFold(n_splits=n_splits, shuffle=True, random_state=2)
-        for train_ids, test_ids in skf.split(x, y):
-
-            start = time.time()
-
-            clf = RandomForestClassifier()
-
-            x_train = x.iloc[train_ids]
-            y_train = y.iloc[train_ids]
-            x_test = x.iloc[test_ids]
-            y_test = y.iloc[test_ids]
-
-            clf.fit(x_train, y_train)
-
-            y_pred = clf.predict(x_test)
-
-            end = time.time()
-
-            metrics = classification_report(
-                y_test, y_pred, output_dict=True, target_names=["False", "True"]
-            )
-
-            accuracy = accuracy_score(y_test, y_pred)
-            f1 = metrics["macro avg"]["f1-score"]
-            cohens_kappa = cohen_kappa_score(y_test, y_pred)
-
-            # Add accuracy and cohens kappa to the metrics dictionary.
-            metrics["accuracy"] = accuracy
-            metrics["cohens_kappa"] = cohens_kappa
-
-            best_list = best_metrics[model_id]
-
-            best_acc = best_list["accuracy"]
-            best_f1 = best_list["f1"]
-            best_ck = best_list["cohens_kappa"]
-
-            for best, current in zip(
-                (best_acc, best_f1, best_ck), (accuracy, f1, cohens_kappa)
-            ):
-                if current > best["value"]:
-                    best["value"] = current
-                    best["metrics"] = metrics
-                    best["model_type"] = clf.__class__.__name__
-
-            best_list["train_time"] = end - start
-
-            # TODO: How to determine which model should be stored 
-            # (accuracy, f1, cohens kappa)?
-            if not best_model or accuracy > best_acc["value"]:
-                best_model = clf
-
-    # Write best results metrics to file
-    with open("model_metrics/" + model_id + ".json", "w") as score_file:
-        json.dump(best_metrics, score_file, indent=4)
-
-    model_columns = list(x.columns)
-    num_features = x.shape[1]
-    # Store all models (no double storing if same model).
-    store_as_onnx(best_model, model_id, model_columns, num_features)
-
-    return best_metrics
-
 
 def init_best_metrics(model_id):
     # Initialize the best training acc, f1, cohens kappa and their models.
@@ -443,6 +280,38 @@ def predictFromAnswers(req: PredictFromLanguageDataRequest):
         predictions.append(do_prediction(data, model_id))
 
     return {"predictions": predictions}
+
+
+def do_prediction(data: DataFrame, model_id: str = None) -> dict:
+
+    session = inf_sessions[model_id]
+
+    query = pd.get_dummies(data)
+    # The columns in string format are retrieved from the model and converted
+    # back to a list.
+    model_columns = (
+        session.get_modelmeta().custom_metadata_map["model_columns"].split(" ")
+    )
+
+    # https://github.com/amirziai/sklearnflask/issues/3
+    # Thanks to @lorenzori
+    query = query.reindex(columns=model_columns, fill_value=0)
+    input_name = session.get_inputs()[0].name
+    # The predict_proba function is used because get_outputs() is indexed at 1.
+    # If it is indexed at 0, the predict method is used.
+    label_name = session.get_outputs()[1].name
+    # Prediction takes place here.
+    pred = session.run([label_name], {input_name: query.to_numpy(dtype=np.float32)})[0]
+
+    # The Prediction dictionary is stored in a list by ONNX so it can be
+    # retrieved by indexing.
+    probs = pred[0]
+
+    # prediction is the class with max probability
+    return {
+        "prediction": max(probs, key=lambda k: probs[k]),
+        "classProbabilities": probs,
+    }
 
 
 @app.get("/wipe_models")
