@@ -13,13 +13,6 @@ def client():
 
 
 @pytest.fixture()
-def xmi_bytes():
-    with open("testdata/xmi/1ET5_7_0.xmi", "rb") as in_file:
-        xmi_bytes = in_file.read()
-    return xmi_bytes
-
-
-@pytest.fixture()
 def mock_instances():
     instance1 = {
         "taskId": "0",
@@ -166,7 +159,7 @@ def test_predictFromAnswers(client, predict_instances):
 
 
 def test_fetchStoredModels(client):
-    response = client.post("/fetchStoredModels")
+    response = client.get("/fetchStoredModels")
     assert response.status_code == 200
 
     response_dict = json.loads(response.content.decode("utf-8"))["modelIds"]

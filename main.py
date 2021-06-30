@@ -73,41 +73,35 @@ for bow_file in os.listdir(bow_model_dir):
             bow_models[model_id].bag = state_dict["bag"]
 
 
-class TrainingInstance(BaseModel):
-    fileName: str
-    modelId: str
-
-
-class TrainFromLanguageDataRequest(BaseModel):
-    instances: List[ShortAnswerInstance]
-    modelId: str
-
-
-class PredictFromLanguageDataRequest(BaseModel):
+class LanguageDataRequest(BaseModel):
+    """A request with language data, used for training and predicting."""
     instances: List[ShortAnswerInstance]
     modelId: str
 
 
 class SinglePrediction(BaseModel):
+    """A single prediction result, including probabilities for individual classes."""
     prediction: Union[int, str]
     classProbabilities: Dict[Union[str, int], float]
 
 
 class PredictFromLanguageDataResponse(BaseModel):
+    """A response containing one or more prediction results."""
     predictions: List[SinglePrediction]
 
 
 class ModelIdResponse(BaseModel):
+    """A response containing the IDs of the models currently available."""
     modelIds: List[str]
 
 
-@app.post("/fetchStoredModels", response_model=ModelIdResponse)
+@app.get("/fetchStoredModels", response_model=ModelIdResponse)
 def fetch_stored_models():
     return {"modelIds": list(inf_sessions.keys())}
 
 
 @app.post("/trainFromAnswers")
-def trainFromAnswers(req: TrainFromLanguageDataRequest):
+def trainFromAnswers(req: LanguageDataRequest):
     model_id = req.modelId
     # All feature extractor objects that should be used, are defined here.
     ft_extractors = [SIMGroupExtractor()]
@@ -248,7 +242,7 @@ def store_as_onnx(model, model_id, model_columns, num_features):
 
 
 @app.post("/predictFromAnswers", response_model=PredictFromLanguageDataResponse)
-def predictFromAnswers(req: PredictFromLanguageDataRequest):
+def predictFromAnswers(req: LanguageDataRequest):
     model_id = req.modelId
 
     if model_id not in [model.rstrip(".onnx") for model in os.listdir(onnx_model_dir)]:
