@@ -101,7 +101,7 @@ class ModelIdResponse(BaseModel):
     modelIds: List[str]
 
 
-@app.post("/fetchStoredModels", response_model=ModelIdResponse)
+@app.get("/fetchStoredModels", response_model=ModelIdResponse)
 def fetch_stored_models():
     return {"modelIds": list(inf_sessions.keys())}
 
