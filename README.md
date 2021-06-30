@@ -7,8 +7,11 @@ This component started out as a fork of sklearnflask, intended to be used as ML 
 The following endpoints currently exist (more detailed documentation at /docs on the running service):
 
 /fetchStoredModels (GET) - fetch IDs of currently stored SAS models
+
 /trainFromAnswers (POST) - train a new model based on submitted answer data
+
 /predictFromAnswers (POST) - predict score of submitted answers
+
 /wipe\_models (GET) - remove all models from service
 
 ## Docker setup
